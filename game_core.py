@@ -47,40 +47,41 @@ def main():
     width = 130
     height = 40
 
-    horizontal  = width//2
-    vertical = height//2
+    h_position  = width//2
+    v_position = height//2
     while True:
         pressed_key = getch()
         board = create_board(width, height, ' ')
         os.system('clear')
-        if board[vertical][horizontal] != '#':
-            old_vertical  = vertical
-            old_horizontal = horizontal
-            if pressed_key == 'd':
-                horizontal += 1
-                insert_player(board, horizontal, vertical)
-                print_board(board)
-            elif pressed_key == 'a':
-                horizontal -= 1
-                insert_player(board, horizontal, vertical)
-                print_board(board)
-            elif pressed_key == 's':
-                vertical += 1
-                insert_player(board, horizontal, vertical)
-                print_board(board)
-            elif pressed_key == 'w':
-                vertical -= 1
-                insert_player(board, horizontal, vertical)
-                print_board(board)
-            elif pressed_key == 'x':
-                quit()
-            elif pressed_key == 'i': #calling inventory
-                pass
-        else:
-            horizontal  = old_horizontal
-            vertical = old_vertical
-            insert_player(board, horizontal, vertical)
+        old_v_position  = v_position
+        old_h_position = h_position
+        if pressed_key == 'd' and board[v_position][h_position +1] != '#':
+            h_position += 1
+            insert_player(board, h_position, v_position)
             print_board(board)
+        elif pressed_key == 'a' and board[v_position][h_position -1] != '#':
+            h_position -= 1
+            insert_player(board, h_position, v_position)
+            print_board(board)
+        elif pressed_key == 's' and board[v_position +1][h_position] != '#':
+            v_position += 1
+            insert_player(board, h_position, v_position)
+            print_board(board)
+        elif pressed_key == 'w' and board[v_position -1][h_position] != '#':
+            v_position -= 1
+            insert_player(board, h_position, v_position)
+            print_board(board)
+        elif pressed_key == 'x':
+            quit()
+        elif pressed_key == 'i': #calling inventory
+            pass
+        else:
+            h_position  = old_h_position
+            v_position = old_v_position
+            insert_player(board, h_position, v_position)
+            print_board(board)
+            
 
 main()
+
 
