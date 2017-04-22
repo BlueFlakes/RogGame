@@ -42,8 +42,60 @@ def insert_player(board, pos_x, pos_y ):
     board[pos_y][pos_x] = '@'
     return board
 
+def show_welcome():
+
+    welcome = [
+
+
+"""                    __
+                 .-'||'-.
+               .'   ||   '.             HOCKEY: SUCKS
+              /   __||__   \
+\\
+              | /`-    -`\ |            OCCER: SUCKS
+              | | 6    6 | |
+              \/\____7___/\/            BASEBALL: SUCKS""",
+
+
+"""      .--------:\:I:II:I:/;--------.
+     /          \`:I::I:`/          \   BASKETBALL: SUCKS
+    |            `------'            |
+    |             \____/             |  CRICKET: SUCKS""",
+
+"""    |      ,    __     ___    ,      |
+    |======|   /  |   / _ \   |======|  RUGBY: SUCKS
+    |======|   ^| |  | | | |  |======|
+    |~~~~~|     | |  | |_| |   |~~~~~|  CURLING: SUCKS
+    |     |\   [___]  \___/   /|     |""",
+
+"""     \    \|                  |/    /
+     `\    \  _ _.-=""=-._ _  /    /'
+       `\   '`_)\\-++++-//(_`'   /'
+         ;   (__||      ||__)   ;       FOOTBALL: DOESN'T SUCK
+          ;   ___\      /___   ;
+           '. ---/-=..=-\--- .'         ANY QUESTIONS
+             `""`        `""`
+    """]
+
+
+    for item in welcome:
+        print(item)
+        sleep(1)
+    print("Welcome in Final Fantasy Football Game!")
+    sleep(3)
+
+
+
+
+
+
+
+
+
+
 
 def main():
+    show_welcome()
     width = 130
     height = 40
 
@@ -80,8 +132,6 @@ def main():
             v_position = old_v_position
             insert_player(board, h_position, v_position)
             print_board(board)
-            
+
 
 main()
-
-
