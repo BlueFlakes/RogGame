@@ -5,11 +5,14 @@ from random import randint
 
 def getch():
     import sys, tty, termios
+    from select import select
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
         tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
+        [i, o, e] = select([sys.stdin.fileno()], [], [], 0.35)
+        if i: ch=sys.stdin.read(1)
+        else: ch=''
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
@@ -81,17 +84,40 @@ def show_welcome():
     for item in welcome:
         print(item)
         sleep(1)
-    print("Welcome in Final Fantasy Football Game!")
+    print("Welcome to the Final Fantasy Football Game!")
     sleep(3)
 
 
+def hero_walking(pressed_key, board, h_position, v_position):
 
+    if pressed_key == 'd' and board[v_position][h_position +1] != '#':
+        h_position += 1
+    elif pressed_key == 'a' and board[v_position][h_position -1] != '#':
+        h_position -= 1
+    elif pressed_key == 's' and board[v_position +1][h_position] != '#':
+        v_position += 1
+    elif pressed_key == 'w' and board[v_position -1][h_position] != '#':
+        v_position -= 1
 
+    return h_position, v_position
 
+def insert_monster(board, random=False):
+    if random == True:
+        x = randint(8, 10)
+        y = randint(8, 10)
+    else:
+        x = 8
+        y = 8
 
-
-
-
+    board[y][x] = "/"
+    board[y][x + 1] = "\\"
+    board[y][x+3] = "/"
+    board[y][x+4] = "\\"
+    board[y-1][x+3] = "_"
+    board[y-1][x+2] = "_"
+    board[y-1][x+1] = "_"
+    board[y-1][x] = "^"
+    return board
 
 
 def main():
@@ -99,39 +125,39 @@ def main():
     width = 130
     height = 40
 
-    h_position  = width//2
-    v_position = height//2
+    player_move_counter = 0
+
+    horizontal_pos  = width//2
+    vertical_pos = height//2
+
+
+
+    board = create_board(width, height, ' ')
+    insert_player(board, horizontal_pos, vertical_pos)
+
     while True:
         pressed_key = getch()
         board = create_board(width, height, ' ')
         os.system('clear')
-        old_v_position  = v_position
-        old_h_position = h_position
-        if pressed_key == 'd' and board[v_position][h_position +1] != '#':
-            h_position += 1
-            insert_player(board, h_position, v_position)
-            print_board(board)
-        elif pressed_key == 'a' and board[v_position][h_position -1] != '#':
-            h_position -= 1
-            insert_player(board, h_position, v_position)
-            print_board(board)
-        elif pressed_key == 's' and board[v_position +1][h_position] != '#':
-            v_position += 1
-            insert_player(board, h_position, v_position)
-            print_board(board)
-        elif pressed_key == 'w' and board[v_position -1][h_position] != '#':
-            v_position -= 1
-            insert_player(board, h_position, v_position)
-            print_board(board)
-        elif pressed_key == 'x':
-            quit()
-        elif pressed_key == 'i': #calling inventory
-            pass
-        else:
-            h_position  = old_h_position
-            v_position = old_v_position
-            insert_player(board, h_position, v_position)
-            print_board(board)
 
+        if pressed_key in ['w','a','s','d']:
+            horizontal_pos, vertical_pos = hero_walking(pressed_key, board, horizontal_pos, vertical_pos)
+        elif pressed_key == 'x':
+            exit()
+        player = insert_player(board, horizontal_pos, vertical_pos)
+
+        if not pressed_key.isalpha() or player_move_counter == 5:
+            monster = insert_monster(board, True)
+            player_move_counter = 0
+        else:
+            monster = insert_monster(board)
+        player_move_counter += 1
+
+
+        for game_element in [player, monster]:  # tutaj sumujesz do boarda dodatkowe elementy
+            board = game_element                # aby razem zostały wyświetlone
+
+
+        print_board(board)
 
 main()
