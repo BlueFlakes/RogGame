@@ -101,13 +101,11 @@ def hero_walking(pressed_key, board, h_position, v_position):
 
     return h_position, v_position
 
-def insert_monster(board, random=False):
-    if random == True:
-        x = randint(8, 10)
-        y = randint(8, 10)
-    else:
-        x = 8
-        y = 8
+def insert_monster(board):
+
+    x = randint(8, 10)
+    y = randint(8, 10)
+
 
     board[y][x] = "/"
     board[y][x + 1] = "\\"
@@ -130,8 +128,6 @@ def main():
     horizontal_pos  = width//2
     vertical_pos = height//2
 
-
-
     board = create_board(width, height, ' ')
     insert_player(board, horizontal_pos, vertical_pos)
 
@@ -146,12 +142,9 @@ def main():
             exit()
         player = insert_player(board, horizontal_pos, vertical_pos)
 
-        if not pressed_key.isalpha() or player_move_counter == 5:
-            monster = insert_monster(board, True)
-            player_move_counter = 0
-        else:
-            monster = insert_monster(board)
-        player_move_counter += 1
+
+        monster = insert_monster(board)
+
 
 
         for game_element in [player, monster]:  # tutaj sumujesz do boarda dodatkowe elementy
