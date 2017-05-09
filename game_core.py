@@ -1,6 +1,15 @@
+
 import os
 from time import sleep
 from random import randint
+import random
+
+
+class colors:
+    SILVER = '\033[90m'
+    GOLD = '\033[93m'
+    ELITE = '\033[91m'
+    END = '\x1b[0m'
 
 
 def getch():
@@ -83,9 +92,9 @@ def show_welcome():
 
     for item in welcome:
         print(item)
-        sleep(1)
+        sleep(0.2)
     print("Welcome to the Final Fantasy Football Game!")
-    sleep(3)
+    sleep(1)
 
 
 def hero_walking(pressed_key, board, h_position, v_position):
@@ -118,8 +127,124 @@ def insert_monster(board):
     return board
 
 
+def insert_footballer(footballer_x, footballer_y, board, position, tier):
+    """
+    position = att, mid , deff or gk
+    tier: silver = 0
+          gold   = 1
+          elite  = 2
+
+
+    """
+    #silver, gold, red, end
+    colors = ['\033[90m', '\033[93m', '\033[91m', '\x1b[0m']
+    x = footballer_x
+    y = footballer_y 
+
+    if position == 'att':
+        board[y][x] = str(colors[tier]) + 'Ⓐ' + str(colors[3])
+    elif position == 'mid':
+        board[y][x] = str(colors[tier]) + 'Ⓜ' + str(colors[3])
+    elif position == 'deff':
+        board[y][x] = str(colors[tier]) + 'Ⓓ' + str(colors[3])
+    elif position == 'gk':
+        board[y][x] = str(colors[tier]) + 'Ⓖ' + str(colors[3])
+
+    return colors
+
+
+def generate_footballers(xx, yy, board):
+    for i in range(1,4):
+        insert_footballer(xx[i], yy[i], board, 'att', 0)
+    for i in range(4,6):
+        insert_footballer(xx[i], yy[i], board, 'att', 1)
+    for i in range(6,7):
+        insert_footballer(xx[i], yy[i], board, 'att', 2)
+    for i in range(7,11):
+        insert_footballer(xx[i], yy[i], board, 'mid', 0)
+    for i in range(11,13):
+        insert_footballer(xx[i], yy[i], board, 'mid', 1)
+    for i in range(13,14):
+        insert_footballer(xx[i], yy[i], board, 'mid', 2)
+    for i in range(14,18):
+        insert_footballer(xx[i], yy[i], board, 'deff', 0)
+    for i in range(18,20):
+        insert_footballer(xx[i], yy[i], board, 'deff', 1)
+    for i in range(20,21):
+        insert_footballer(xx[i], yy[i], board, 'deff', 2)
+    for i in range(21,23):
+        insert_footballer(xx[i], yy[i], board, 'gk', 0)
+    for i in range(23,24):
+        insert_footballer(xx[i], yy[i], board, 'gk', 1)
+    return board
+
+
+def ask_question(difficulty, easy_questions, medium_questions, hard_questions, easy_answers, medium_answers, hard_answers):
+        """ 
+        difficulty: easy, medium or hard
+        """
+        if difficulty == 'easy':
+            random_digit = randint(0,len(easy_questions) - 1)
+            answer = input(easy_questions[random_digit])
+            if answer == easy_answers[random_digit]:
+                sleep(2) # dodac warunek co w przypadku zwyciestwa
+
+        if difficulty == 'medium':
+            random_digit = randint(0,len(medium_questions) - 1)
+            answer = input(medium_questions[random_digit])
+            if answer == medium_answers[random_digit]:
+                sleep(2) # dodac warunek co w przypadku zwyciestwa
+
+        if difficulty == 'hard':
+            random_digit = randint(0,len(hard_questions) - 1)
+            answer = input(hard_questions[random_digit])
+            if answer == hard_answers[random_digit]:
+                sleep(2) # dodac warunek co w przypadku zwyciestwa
+
+
+def generate_question(board,vertical_pos, horizontal_pos):
+    """
+
+    """
+    easy_questions = ['easy question1', 'easy question2', 'easy question3']
+    medium_questions = ['medium question1', 'medium question2', 'medium question3']
+    hard_questions = ['hard question1', 'hard question2', 'hard question3']
+
+    easy_answers = ['answer1', 'answer2', 'answer3']
+    medium_answers = ['answer1', 'answer2', 'answer3']
+    hard_answers = ['answer1', 'answer2', 'answer3']
+    if (board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓐ' + colors.END) 
+        or board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓜ' + colors.END) 
+        or board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓓ' + colors.END) 
+        or board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓖ' + colors.END)
+        ):
+        ask_question('easy', easy_questions, medium_questions, hard_questions, 
+                        easy_answers, medium_answers, hard_answers)
+        horizontal_pos += 1
+
+    if (board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓐ' + colors.END) 
+        or board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓜ' + colors.END) 
+        or board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓓ' + colors.END) 
+        or board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓖ' + colors.END)
+        ):
+        ask_question('medium', easy_questions, medium_questions, hard_questions, 
+                        easy_answers, medium_answers, hard_answers)
+        horizontal_pos += 1
+
+    if (board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓐ' + colors.END) 
+        or board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓜ' + colors.END) 
+        or board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓓ' + colors.END) 
+        or board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓖ' + colors.END)
+        ):
+        ask_question('hard', easy_questions, medium_questions, hard_questions, 
+                        easy_answers, medium_answers, hard_answers)
+        horizontal_pos += 1
+
+    return horizontal_pos
+
+
 def main():
-    show_welcome()
+ #   show_welcome()
     width = 130
     height = 40
 
@@ -129,7 +254,15 @@ def main():
     vertical_pos = height//2
 
     board = create_board(width, height, ' ')
-    insert_player(board, horizontal_pos, vertical_pos)
+
+    # creating lists of x,y coordinates for footballers generating
+    xx = []
+    yy = []
+
+    for i in range(30):
+        xx.append(randint(1, width-1))
+        yy.append(randint(1, height-1))
+
 
     while True:
         pressed_key = getch()
@@ -142,15 +275,12 @@ def main():
             exit()
         player = insert_player(board, horizontal_pos, vertical_pos)
 
-
         monster = insert_monster(board)
 
-
-
-        for game_element in [player, monster]:  # tutaj sumujesz do boarda dodatkowe elementy
-            board = game_element                # aby razem zostały wyświetlone
-
+        generate_footballers(xx, yy, board)
+        horizontal_pos = generate_question(board,vertical_pos, horizontal_pos)
 
         print_board(board)
-
+        print(vertical_pos, horizontal_pos)
+        print(board[vertical_pos][horizontal_pos])
 main()
