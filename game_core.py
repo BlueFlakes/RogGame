@@ -153,29 +153,13 @@ def insert_footballer(footballer_x, footballer_y, board, position, tier):
     return colors
 
 
-def generate_footballers(xx, yy, board):
-    for i in range(1,4):
-        insert_footballer(xx[i], yy[i], board, 'att', 0)
-    for i in range(4,6):
-        insert_footballer(xx[i], yy[i], board, 'att', 1)
-    for i in range(6,7):
-        insert_footballer(xx[i], yy[i], board, 'att', 2)
-    for i in range(7,11):
-        insert_footballer(xx[i], yy[i], board, 'mid', 0)
-    for i in range(11,13):
-        insert_footballer(xx[i], yy[i], board, 'mid', 1)
-    for i in range(13,14):
-        insert_footballer(xx[i], yy[i], board, 'mid', 2)
-    for i in range(14,18):
-        insert_footballer(xx[i], yy[i], board, 'deff', 0)
-    for i in range(18,20):
-        insert_footballer(xx[i], yy[i], board, 'deff', 1)
-    for i in range(20,21):
-        insert_footballer(xx[i], yy[i], board, 'deff', 2)
-    for i in range(21,23):
-        insert_footballer(xx[i], yy[i], board, 'gk', 0)
-    for i in range(23,24):
-        insert_footballer(xx[i], yy[i], board, 'gk', 1)
+def generate_footballers(xx, yy, board, positions_list, tiers_list, total_number):
+    """
+    inserts footballers in random position which is taken from xx and yy lists and their 
+    look depends on position and tier, imported from parameters
+    """
+    for i in range(1, total_number):
+        insert_footballer(xx[i], yy[i], board, positions_list[i], tiers_list[i])
     return board
 
 
@@ -258,10 +242,16 @@ def main():
     # creating lists of x,y coordinates for footballers generating
     xx = []
     yy = []
+    positions = ['att', 'mid', 'def', 'gk']
+    tiers = [0, 1, 2]
+    positions_list = []
+    tiers_list = []
 
-    for i in range(30):
+    for i in range(100):
         xx.append(randint(1, width-1))
         yy.append(randint(1, height-1))
+        positions_list.append(random.choice(positions))
+        tiers_list.append(random.choice(tiers))
 
 
     while True:
@@ -277,7 +267,7 @@ def main():
 
         monster = insert_monster(board)
 
-        generate_footballers(xx, yy, board)
+        generate_footballers(xx, yy, board, positions_list, tiers_list, 35)
         horizontal_pos = generate_question(board,vertical_pos, horizontal_pos)
 
         print_board(board)
