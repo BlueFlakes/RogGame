@@ -216,29 +216,13 @@ def insert_footballer(footballer_x, footballer_y, board, position, tier):
     return colors
 
 
-def generate_footballers(xx, yy, board):
-    for i in range(1,4):
-        insert_footballer(xx[i], yy[i], board, 'att', 0)
-    for i in range(4,6):
-        insert_footballer(xx[i], yy[i], board, 'att', 1)
-    for i in range(6,7):
-        insert_footballer(xx[i], yy[i], board, 'att', 2)
-    for i in range(7,11):
-        insert_footballer(xx[i], yy[i], board, 'mid', 0)
-    for i in range(11,13):
-        insert_footballer(xx[i], yy[i], board, 'mid', 1)
-    for i in range(13,14):
-        insert_footballer(xx[i], yy[i], board, 'mid', 2)
-    for i in range(14,18):
-        insert_footballer(xx[i], yy[i], board, 'deff', 0)
-    for i in range(18,20):
-        insert_footballer(xx[i], yy[i], board, 'deff', 1)
-    for i in range(20,21):
-        insert_footballer(xx[i], yy[i], board, 'deff', 2)
-    for i in range(21,23):
-        insert_footballer(xx[i], yy[i], board, 'gk', 0)
-    for i in range(23,24):
-        insert_footballer(xx[i], yy[i], board, 'gk', 1)
+def generate_footballers(xx, yy, board, positions_list, tiers_list):
+    """
+    inserts footballers in random position which is taken from xx and yy lists and their
+    look depends on position and tier, imported from parameters
+    """
+    for i in range(len(xx)):
+        insert_footballer(xx[i], yy[i], board, positions_list[i], tiers_list[i])
     return board
 
 
@@ -324,15 +308,27 @@ def main():
     # creating lists of x,y coordinates for footballers generating
     xx = []
     yy = []
+
     footballers_amount = 0
+    positions = ['att', 'mid', 'def', 'gk']
+    tiers = [0, 1, 2]
+    positions_list = []
+    tiers_list = []
+
 
     while footballers_amount < 30:
-        footballer_x = randint(1, width-1)
-        footballer_y = randint(1, height-1)
+        footballer_x = randint(2, width-2)
+        footballer_y = randint(2, height-2)
 
-        if board[footballer_y][footballer_x] == " ":
+        if (board[footballer_y-1][footballer_x] == " " and
+            board[footballer_y+1][footballer_x] == " " and
+            board[footballer_y][footballer_x-1] == " " and
+            board[footballer_y][footballer_x+1] == " "):
+
             xx.append(footballer_x)
             yy.append(footballer_y)
+            positions_list.append(random.choice(positions))
+            tiers_list.append(random.choice(tiers))
 
             footballers_amount += 1
 
@@ -356,7 +352,7 @@ def main():
 
 
 
-        generate_footballers(xx, yy, board)
+        generate_footballers(xx, yy, board, positions_list, tiers_list)
         horizontal_pos = generate_question(board,vertical_pos, horizontal_pos)
 
 
