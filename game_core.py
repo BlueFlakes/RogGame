@@ -1,7 +1,9 @@
 import os
 from time import sleep
 from random import randint
+from random import randrange
 
+reserved_sign = ["#", '\033[92m' + '#' + '\33[37m', "@"]
 
 def getch():
     import sys, tty, termios
@@ -18,7 +20,7 @@ def getch():
     return ch
 
 
-def create_board(width, height, sign):
+def create_first_board(width, height, sign):
     board = []
     for row in range(height):
         item_in_row = []
@@ -32,7 +34,80 @@ def create_board(width, height, sign):
                 else:
                     item_in_row.append(sign)
         board.append(item_in_row)
+
     return board
+
+def create_building(box_range, board, pos_x=0, pos_y=0):
+
+    for x in range(0, box_range):
+        for y in range(0, box_range):
+            if x == 0 or x == (box_range - 1):    # because func range count from 0 not from 1
+                board[x + pos_x][y + pos_y] = reserved_sign[1]
+            else:
+                if y == 0 or y == box_range - 1:
+                    board[x + pos_x][y + pos_y] = reserved_sign[1]
+                else:
+                    board[x + pos_x][y + pos_y] = '\033[30m' + '.' + '\33[37m'
+    return board
+
+
+def create_random_amount_of_buildings(board):
+    for buildings in range(501):
+        safe = True
+        building_range = randrange(5, 12, 2)
+        counter_errors = 0
+        random_pos_x = randint(0, 122 - building_range)
+        random_pos_y = randint(0, 42 - building_range)
+
+        for x in range(building_range+2):
+
+            if board[x+int(building_range/2)+random_pos_y][int(building_range/2)+random_pos_x] in reserved_sign:
+                counter_errors += 1
+            if board[int(building_range/2)+random_pos_y][x+int(building_range/2)+random_pos_x] in reserved_sign:
+                counter_errors += 1
+            if board[-x+int(building_range/2)+random_pos_y][int(building_range/2)+random_pos_x] in reserved_sign:
+                counter_errors += 1
+            if board[int(building_range/2)+random_pos_y][-x+int(building_range/2)+random_pos_x] in reserved_sign:
+                counter_errors += 1
+            if board[x+int(building_range/2)+random_pos_y][x+int(building_range/2)+random_pos_x] in reserved_sign:
+                counter_errors += 1
+            if board[-x+int(building_range/2)+random_pos_y][x+int(building_range/2)+random_pos_x] in reserved_sign:
+                counter_errors += 1
+            if board[-x+int(building_range/2)+random_pos_y][-x+int(building_range/2)+random_pos_x] in reserved_sign:
+                counter_errors += 1
+            if board[x+int(building_range/2)+random_pos_y][-x+int(building_range/2)+random_pos_x] in reserved_sign:
+                counter_errors += 1
+
+            if x == (building_range +1):
+
+                for y in range(1, int((building_range+1)/2)+1):
+                    if board[x+int(building_range/2)+random_pos_y][y+int(building_range/2)+random_pos_x] in reserved_sign:
+                        counter_errors += 1
+                    if board[x+int(building_range/2)+random_pos_y][-y+int(building_range/2)+random_pos_x] in reserved_sign:
+                        counter_errors += 1
+                    if board[-x+int(building_range/2)+random_pos_y][y+int(building_range/2)+random_pos_x] in reserved_sign:
+                        counter_errors += 1
+                    if board[-x+int(building_range/2)+random_pos_y][-y+int(building_range/2)+random_pos_x] in reserved_sign:
+                        counter_errors += 1
+                    if board[-y+int(building_range/2)+random_pos_y][x+int(building_range/2)+random_pos_x] in reserved_sign:
+                        counter_errors += 1
+                    if board[y+int(building_range/2)+random_pos_y][x+int(building_range/2)+random_pos_x] in reserved_sign:
+                        counter_errors += 1
+                    if board[-y+int(building_range/2)+random_pos_y][-x+int(building_range/2)+random_pos_x] in reserved_sign:
+                        counter_errors += 1
+                    if board[y+int(building_range/2)+random_pos_y][-x+int(building_range/2)+random_pos_x] in reserved_sign:
+                        counter_errors += 1
+
+        if counter_errors != 0:
+            safe = False
+        else:
+            safe = True
+
+        if safe == True:
+            board = create_building(building_range, board, random_pos_y, random_pos_x)
+
+    return board
+
 
 
 def print_board(board):
@@ -41,7 +116,8 @@ def print_board(board):
             print(column, end = '')
         print()
 
-def insert_player(board, pos_x, pos_y ):
+def insert_player(board, pos_x, pos_y, old_h, old_v ):
+    board[old_v][old_h] = " "
     board[pos_y][pos_x] = '@'
     return board
 
@@ -90,65 +166,55 @@ def show_welcome():
 
 def hero_walking(pressed_key, board, h_position, v_position):
 
-    if pressed_key == 'd' and board[v_position][h_position +1] != '#':
+    if pressed_key == 'd' and board[v_position][h_position +1] not in reserved_sign:
         h_position += 1
-    elif pressed_key == 'a' and board[v_position][h_position -1] != '#':
+    elif pressed_key == 'a' and board[v_position][h_position -1] not in reserved_sign:
         h_position -= 1
-    elif pressed_key == 's' and board[v_position +1][h_position] != '#':
+    elif pressed_key == 's' and board[v_position +1][h_position] not in reserved_sign:
         v_position += 1
-    elif pressed_key == 'w' and board[v_position -1][h_position] != '#':
+    elif pressed_key == 'w' and board[v_position -1][h_position] not in reserved_sign:
         v_position -= 1
 
     return h_position, v_position
 
-def insert_monster(board):
-
-    x = randint(8, 10)
-    y = randint(8, 10)
-
-
-    board[y][x] = "/"
-    board[y][x + 1] = "\\"
-    board[y][x+3] = "/"
-    board[y][x+4] = "\\"
-    board[y-1][x+3] = "_"
-    board[y-1][x+2] = "_"
-    board[y-1][x+1] = "_"
-    board[y-1][x] = "^"
-    return board
-
 
 def main():
-    show_welcome()
+#    show_welcome()
     width = 130
-    height = 40
+    height = 50
 
-    player_move_counter = 0
+
 
     horizontal_pos  = width//2
     vertical_pos = height//2
 
-    board = create_board(width, height, ' ')
-    insert_player(board, horizontal_pos, vertical_pos)
+    board = create_first_board(width, height, ' ')
+    board_with_buildings = create_random_amount_of_buildings(board) # added buildings to map
+
 
     while True:
+        print()
+
         pressed_key = getch()
-        board = create_board(width, height, ' ')
+
         os.system('clear')
 
+        board = board_with_buildings
+
+        old_horizontal = horizontal_pos
+        old_vertical = vertical_pos
         if pressed_key in ['w','a','s','d']:
             horizontal_pos, vertical_pos = hero_walking(pressed_key, board, horizontal_pos, vertical_pos)
         elif pressed_key == 'x':
             exit()
-        player = insert_player(board, horizontal_pos, vertical_pos)
+
+        player = insert_player(board, horizontal_pos, vertical_pos, old_horizontal, old_vertical)
 
 
-        monster = insert_monster(board)
 
 
 
-        for game_element in [player, monster]:  # tutaj sumujesz do boarda dodatkowe elementy
-            board = game_element                # aby razem zostały wyświetlone
+
 
 
         print_board(board)
