@@ -249,17 +249,20 @@ def ask_question(difficulty, easy_questions, medium_questions, hard_questions, e
                 sleep(2) # dodac warunek co w przypadku zwyciestwa
 
 
+def load_data(filename):
+    with open (filename, 'r') as file:
+            content = file.readlines()
+    return content
+
+
 def generate_question(board,vertical_pos, horizontal_pos):
-    """
+    easy_questions = load_data('easy_questions.csv')
+    medium_questions = load_data('medium_questions.csv')
+    hard_questions = load_data('hard_questions.csv')
 
-    """
-    easy_questions = ['easy question1', 'easy question2', 'easy question3']
-    medium_questions = ['medium question1', 'medium question2', 'medium question3']
-    hard_questions = ['hard question1', 'hard question2', 'hard question3']
-
-    easy_answers = ['answer1', 'answer2', 'answer3']
-    medium_answers = ['answer1', 'answer2', 'answer3']
-    hard_answers = ['answer1', 'answer2', 'answer3']
+    easy_answers = load_data('easy_answers.csv')
+    medium_answers = load_data('medium_answers.csv')
+    hard_answers = load_data('hard_answers.csv')
     if (board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓐ' + colors.END)
         or board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓜ' + colors.END)
         or board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓓ' + colors.END)
