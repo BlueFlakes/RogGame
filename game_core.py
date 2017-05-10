@@ -17,6 +17,8 @@ class colors:
 
 reserved_sign = ["#", '\033[92m' + '#' + '\33[37m', "@"]
 
+
+'''
 def getch():
     import sys, tty, termios
     from select import select
@@ -30,6 +32,19 @@ def getch():
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
+'''
+
+
+def getch():
+    import sys, tty, termios
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
 
 
 def create_first_board(width, height, sign):
@@ -37,11 +52,11 @@ def create_first_board(width, height, sign):
     for row in range(height):
         item_in_row = []
 
-        for column in range(width):
+        for column in range(width-1):
             if row == 0 or row == (height - 1):
                 item_in_row.append("#")
             else:
-                if column == 0 or column == (width - 1):
+                if column == 0 or column == 130 or column == 178:
                     item_in_row.append("#")
                 else:
                     item_in_row.append(sign)
@@ -232,18 +247,21 @@ def ask_question(difficulty, easy_questions, medium_questions, hard_questions, e
         """
         if difficulty == 'easy':
             random_digit = randint(0,len(easy_questions) - 1)
+            print("If you answer this question, you get random SILVER player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
             answer = input(easy_questions[random_digit])
             if answer == easy_answers[random_digit]:
                 sleep(2) # dodac warunek co w przypadku zwyciestwa
 
         if difficulty == 'medium':
             random_digit = randint(0,len(medium_questions) - 1)
+            print("If you answer this question, you get random GOLD player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
             answer = input(medium_questions[random_digit])
             if answer == medium_answers[random_digit]:
                 sleep(2) # dodac warunek co w przypadku zwyciestwa
 
         if difficulty == 'hard':
             random_digit = randint(0,len(hard_questions) - 1)
+            print("If you answer this question, you get random ELITE player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
             answer = input(hard_questions[random_digit])
             if answer == hard_answers[random_digit]:
                 sleep(2) # dodac warunek co w przypadku zwyciestwa
@@ -295,7 +313,7 @@ def generate_question(board,vertical_pos, horizontal_pos):
 
 def main():
 
-    width = 130
+    width = 180
     height = 50
 
 
@@ -320,7 +338,7 @@ def main():
 
 
     while footballers_amount < 30:
-        footballer_x = randint(2, width-2)
+        footballer_x = randint(2, 129)
         footballer_y = randint(2, height-2)
 
         if (board[footballer_y-1][footballer_x] == " " and
@@ -361,5 +379,6 @@ def main():
 
         print_board(board)
         print(vertical_pos, horizontal_pos)
-        print(board[vertical_pos][horizontal_pos])
+
+
 main()
