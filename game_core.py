@@ -273,39 +273,10 @@ def load_data(filename):
     return content
 
 
-def ask_question(difficulty, position, easy_questions, medium_questions, hard_questions, easy_answers, medium_answers, hard_answers, reserve_players):
-        """
-        difficulty: easy, medium or hard
-        """
-        if difficulty == 'easy':
-            random_digit = randint(0,len(easy_questions) - 1)
-            print("If you answer this question, you get random SILVER player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
-            print(easy_answers[random_digit]) #CODE
-            answer = input(easy_questions[random_digit])
-
-            if answer == easy_answers[random_digit].lower().rstrip():
-                reserve_players.append(load_footballer(position, 'SILVER'))
-
-        if difficulty == 'medium':
-            random_digit = randint(0,len(medium_questions) - 1)
-            print("If you answer this question, you get random GOLD player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
-            print(medium_answers[random_digit]) #CODE
-            answer = input(medium_questions[random_digit])
-
-            if answer == medium_answers[random_digit].lower().rstrip():
-                reserve_players.append(load_footballer(position, 'GOLD'))
-
-        if difficulty == 'hard':
-            random_digit = randint(0,len(hard_questions) - 1)
-            print("If you answer this question, you get random ELITE player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
-            print(hard_answers[random_digit]) #CODE
-            answer = input(hard_questions[random_digit])
-
-            if answer == hard_answers[random_digit].lower().rstrip():
-                reserve_players.append(load_footballer(position, 'ELITE'))
-
-
-def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
+def ask_question(position, tier, reserve_players):
+    """
+    tier: SILVER, GOLD, ELITE
+    """
     easy_questions = load_data('easy_questions.csv')
     medium_questions = load_data('medium_questions.csv')
     hard_questions = load_data('hard_questions.csv')
@@ -313,55 +284,56 @@ def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
     medium_answers = load_data('medium_answers.csv')
     hard_answers = load_data('hard_answers.csv')
 
+    if tier == 'SILVER':
+        random_digit = randint(0,len(easy_questions) - 1)
+        print("If you answer this question, you get random SILVER player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
+        print(easy_answers[random_digit]) #CODE
+        answer = input(easy_questions[random_digit])
+
+        if answer == easy_answers[random_digit].lower().rstrip():
+            reserve_players.append(load_footballer(position, 'SILVER'))
+
+    if tier == 'GOLD':
+        random_digit = randint(0,len(medium_questions) - 1)
+        print("If you answer this question, you get random GOLD player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
+        print(medium_answers[random_digit]) #CODE
+        answer = input(medium_questions[random_digit])
+
+        if answer == medium_answers[random_digit].lower().rstrip():
+            reserve_players.append(load_footballer(position, 'GOLD'))
+
+    if tier == 'ELITE':
+        random_digit = randint(0,len(hard_questions) - 1)
+        print("If you answer this question, you get random ELITE player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
+        print(hard_answers[random_digit]) #CODE
+        answer = input(hard_questions[random_digit])
+
+        if answer == hard_answers[random_digit].lower().rstrip():
+            reserve_players.append(load_footballer(position, 'ELITE'))
+
+
+def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
+
+    dictionary = { 
+                    colors.SILVER + 'Ⓐ' + colors.END : ['att','SILVER'],
+                    colors.SILVER + 'Ⓜ' + colors.END : ['mid','SILVER'],
+                    colors.SILVER + 'Ⓓ' + colors.END : ['deff','SILVER'],
+                    colors.SILVER + 'Ⓖ' + colors.END : ['gk','SILVER'],
+                    colors.GOLD + 'Ⓐ' + colors.END : ['att','GOLD'],
+                    colors.GOLD + 'Ⓜ' + colors.END : ['mid','GOLD'],
+                    colors.GOLD + 'Ⓓ' + colors.END : ['deff','GOLD'],
+                    colors.GOLD + 'Ⓖ' + colors.END : ['gk','GOLD'],
+                    colors.ELITE + 'Ⓐ' + colors.END : ['att','ELITE'],
+                    colors.ELITE + 'Ⓜ' + colors.END : ['mid','ELITE'],
+                    colors.ELITE + 'Ⓓ' + colors.END : ['deff','ELITE'],
+                    colors.ELITE + 'Ⓖ' + colors.END : ['gk','ELITE'],
+                    }
+
     current_pos = board[vertical_pos][horizontal_pos]
-    if current_pos == (colors.SILVER + 'Ⓐ' + colors.END):
-        ask_question('easy', 'att', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.SILVER + 'Ⓜ' + colors.END):
-        ask_question('easy', 'mid', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.SILVER + 'Ⓓ' + colors.END):
-        ask_question('easy', 'deff', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.SILVER + 'Ⓖ' + colors.END):
-        ask_question('easy', 'gk', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.GOLD + 'Ⓐ' + colors.END):
-        ask_question('medium', 'att', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.GOLD + 'Ⓜ' + colors.END):
-        ask_question('medium', 'mid', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.GOLD + 'Ⓓ' + colors.END):
-        ask_question('medium', 'deff', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.GOLD + 'Ⓖ' + colors.END):
-        ask_question('medium', 'gk', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.ELITE + 'Ⓐ' + colors.END):
-        ask_question('hard', 'att', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.ELITE + 'Ⓜ' + colors.END):
-        ask_question('hard', 'mid', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.ELITE + 'Ⓓ' + colors.END):
-        ask_question('hard', 'deff', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
-    elif current_pos == (colors.ELITE + 'Ⓖ' + colors.END):
-        ask_question('hard', 'gk', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, reserve_players)
-        horizontal_pos += 1
+    if current_pos in dictionary:
+        position = dictionary[current_pos][0]
+        tier = dictionary[current_pos][1]
+        ask_question(position, tier, reserve_players)
 
     return horizontal_pos
 
