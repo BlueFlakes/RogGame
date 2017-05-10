@@ -64,6 +64,20 @@ def create_first_board(width, height, sign):
 
     return board
 
+
+def create_inventory_board(width, height):
+    inventory_board = []
+
+    for row in range(height):
+        temporary_storage = []
+
+        for column in range(width):
+            temporary_storage.append(".")
+
+        inventory_board.append(temporary_storage)
+
+    return inventory_board
+
 def create_building(box_range, board, pos_x=0, pos_y=0):
 
     for x in range(0, box_range):
@@ -191,6 +205,7 @@ def show_welcome():
     sleep(1)
 
 
+
 def hero_walking(pressed_key, board, h_position, v_position):
 
     if pressed_key == 'd' and board[v_position][h_position +1] not in reserved_sign:
@@ -241,21 +256,28 @@ def generate_footballers(xx, yy, board, positions_list, tiers_list):
     return board
 
 
-def ask_question(difficulty, easy_questions, medium_questions, hard_questions, easy_answers, medium_answers, hard_answers):
+def ask_question(difficulty, easy_questions, medium_questions, hard_questions, easy_answers, medium_answers, hard_answers, dragon_loot):
         """
         difficulty: easy, medium or hard
         """
         if difficulty == 'easy':
             random_digit = randint(0,len(easy_questions) - 1)
             print("If you answer this question, you get random SILVER player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
-            answer = input(easy_questions[random_digit])
-            if answer == easy_answers[random_digit]:
-                sleep(2) # dodac warunek co w przypadku zwyciestwa
+            answer = input(easy_questions[random_digit]).lower()
+
+
+            if answer == easy_answers[random_digit].lower().rstrip():
+
+                dragon_loot.append("LAZAR")
+
+
+
 
         if difficulty == 'medium':
             random_digit = randint(0,len(medium_questions) - 1)
             print("If you answer this question, you get random GOLD player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
             answer = input(medium_questions[random_digit])
+
             if answer == medium_answers[random_digit]:
                 sleep(2) # dodac warunek co w przypadku zwyciestwa
 
@@ -263,6 +285,7 @@ def ask_question(difficulty, easy_questions, medium_questions, hard_questions, e
             random_digit = randint(0,len(hard_questions) - 1)
             print("If you answer this question, you get random ELITE player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
             answer = input(hard_questions[random_digit])
+
             if answer == hard_answers[random_digit]:
                 sleep(2) # dodac warunek co w przypadku zwyciestwa
 
@@ -273,7 +296,7 @@ def load_data(filename):
     return content
 
 
-def generate_question(board,vertical_pos, horizontal_pos):
+def generate_question(board,vertical_pos, horizontal_pos, dragon_loot):
     easy_questions = load_data('easy_questions.csv')
     medium_questions = load_data('medium_questions.csv')
     hard_questions = load_data('hard_questions.csv')
@@ -287,7 +310,7 @@ def generate_question(board,vertical_pos, horizontal_pos):
         or board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓖ' + colors.END)
         ):
         ask_question('easy', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers)
+                        easy_answers, medium_answers, hard_answers, dragon_loot)
         horizontal_pos += 1
 
     if (board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓐ' + colors.END)
@@ -296,7 +319,7 @@ def generate_question(board,vertical_pos, horizontal_pos):
         or board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓖ' + colors.END)
         ):
         ask_question('medium', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers)
+                        easy_answers, medium_answers, hard_answers, dragon_loot)
         horizontal_pos += 1
 
     if (board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓐ' + colors.END)
@@ -305,7 +328,7 @@ def generate_question(board,vertical_pos, horizontal_pos):
         or board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓖ' + colors.END)
         ):
         ask_question('hard', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers)
+                        easy_answers, medium_answers, hard_answers, dragon_loot)
         horizontal_pos += 1
 
     return horizontal_pos
@@ -317,7 +340,7 @@ def main():
     height = 50
 
 
-
+    dragon_loot = []
     horizontal_pos  = width//2
     vertical_pos = height//2
 
@@ -354,6 +377,9 @@ def main():
             footballers_amount += 1
 
     while True:
+
+
+
         print()
 
         pressed_key = getch()
@@ -368,13 +394,30 @@ def main():
             horizontal_pos, vertical_pos = hero_walking(pressed_key, board, horizontal_pos, vertical_pos)
         elif pressed_key == 'x':
             exit()
+        elif pressed_key == 'i':
+
+
+            while True:
+                print(dragon_loot)
+                sleep(1)
+                pressed_key = getch()
+                os.system('clear')
+
+                inventory_board = create_inventory_board(101, 101)
+                inventory_board[5][5] = "x"
+                print_board(inventory_board)
+
+                
+                if pressed_key == 'x':
+                    exit()
+
 
         player = insert_player(board, horizontal_pos, vertical_pos, old_horizontal, old_vertical)
 
 
 
         generate_footballers(xx, yy, board, positions_list, tiers_list)
-        horizontal_pos = generate_question(board,vertical_pos, horizontal_pos)
+        horizontal_pos = generate_question(board,vertical_pos, horizontal_pos, dragon_loot)
 
 
         print_board(board)
