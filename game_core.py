@@ -1,11 +1,10 @@
-
 import os
 from time import sleep
-from random import randint
-
-from random import randrange
 
 import random
+from random import randint
+from random import randrange
+
 
 
 class colors:
@@ -33,7 +32,34 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 '''
+def load_footballer(position, tier):
+    """
+    position: att, mid, deff, gk
+    tier: SILVER, GOLD, ELITE
+    """
+    with open ('footballers.csv', 'r') as file:
+        footballers_temp = file.readlines()
 
+    footballers = []
+    for line in footballers_temp:
+        line = line.rstrip()
+        line = line.split(',')
+        footballers.append(line)
+
+    footballers_to_pick = []
+    for player in footballers:
+        if player[1] == position and player[2] == tier:
+            footballers_to_pick.append(player)
+    loaded_footballer = random.choice(footballers_to_pick)
+
+    if tier == 'SILVER':
+        loaded_footballer.append(randint(55,70))
+    elif tier == 'GOLD':
+        loaded_footballer.append(randint(70,85))
+    elif tier == 'ELITE':
+        loaded_footballer.append(randint(85,99))
+
+    return loaded_footballer
 
 def getch():
     import sys, tty, termios
@@ -56,7 +82,7 @@ def create_first_board(width, height, sign):
             if row == 0 or row == (height - 1):
                 item_in_row.append("#")
             else:
-                if column == 0 or column == 130 or column == 178:
+                if column == 0 or column == 150 or column == 178:
                     item_in_row.append("#")
                 else:
                     item_in_row.append(sign)
@@ -97,7 +123,7 @@ def create_random_amount_of_buildings(board):
         safe = True
         building_range = randrange(5, 12, 2)
         counter_errors = 0
-        random_pos_x = randint(0, 122 - building_range)
+        random_pos_x = randint(0, 142 - building_range)
         random_pos_y = randint(0, 42 - building_range)
 
         for x in range(building_range+2):
@@ -256,39 +282,6 @@ def generate_footballers(xx, yy, board, positions_list, tiers_list):
     return board
 
 
-def ask_question(difficulty, easy_questions, medium_questions, hard_questions, easy_answers, medium_answers, hard_answers, dragon_loot):
-        """
-        difficulty: easy, medium or hard
-        """
-        if difficulty == 'easy':
-            random_digit = randint(0,len(easy_questions) - 1)
-            print("If you answer this question, you get random SILVER player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
-            answer = input(easy_questions[random_digit]).lower()
-
-
-            if answer == easy_answers[random_digit].lower().rstrip():
-
-                dragon_loot.append("LAZAR")
-
-
-
-
-        if difficulty == 'medium':
-            random_digit = randint(0,len(medium_questions) - 1)
-            print("If you answer this question, you get random GOLD player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
-            answer = input(medium_questions[random_digit])
-
-            if answer == medium_answers[random_digit]:
-                sleep(2) # dodac warunek co w przypadku zwyciestwa
-
-        if difficulty == 'hard':
-            random_digit = randint(0,len(hard_questions) - 1)
-            print("If you answer this question, you get random ELITE player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
-            answer = input(hard_questions[random_digit])
-
-            if answer == hard_answers[random_digit]:
-                sleep(2) # dodac warunek co w przypadku zwyciestwa
-
 
 def load_data(filename):
     with open (filename, 'r') as file:
@@ -296,39 +289,105 @@ def load_data(filename):
     return content
 
 
-def generate_question(board,vertical_pos, horizontal_pos, dragon_loot):
+def ask_question(difficulty, position, easy_questions, medium_questions, hard_questions, easy_answers, medium_answers, hard_answers, reserve_players):
+
+        """
+        difficulty: easy, medium or hard
+        """
+        if difficulty == 'easy':
+            random_digit = randint(0,len(easy_questions) - 1)
+            print("If you answer this question, you get random SILVER player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
+
+
+            answer = input(easy_questions[random_digit])
+
+            if answer == easy_answers[random_digit].lower().rstrip():
+                dragon_loot.append("LAZAR")
+                reserve_players.append(load_footballer(position, 'SILVER'))
+
+
+        if difficulty == 'medium':
+            random_digit = randint(0,len(medium_questions) - 1)
+            print("If you answer this question, you get random GOLD player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
+            print(medium_answers[random_digit]) #CODE
+            answer = input(medium_questions[random_digit])
+
+
+            if answer == medium_answers[random_digit].lower().rstrip():
+                reserve_players.append(load_footballer(position, 'GOLD'))
+
+
+        if difficulty == 'hard':
+            random_digit = randint(0,len(hard_questions) - 1)
+            print("If you answer this question, you get random ELITE player!" + "\n" + "If you fail, you will loose precious TIME!" + "\n")
+            print(hard_answers[random_digit]) #CODE
+            answer = input(hard_questions[random_digit])
+
+
+            if answer == hard_answers[random_digit].lower().rstrip():
+                reserve_players.append(load_footballer(position, 'ELITE'))
+
+
+
+def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
+
     easy_questions = load_data('easy_questions.csv')
     medium_questions = load_data('medium_questions.csv')
     hard_questions = load_data('hard_questions.csv')
-
     easy_answers = load_data('easy_answers.csv')
     medium_answers = load_data('medium_answers.csv')
     hard_answers = load_data('hard_answers.csv')
-    if (board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓐ' + colors.END)
-        or board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓜ' + colors.END)
-        or board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓓ' + colors.END)
-        or board[vertical_pos][horizontal_pos] == (colors.SILVER + 'Ⓖ' + colors.END)
-        ):
-        ask_question('easy', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, dragon_loot)
-        horizontal_pos += 1
 
-    if (board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓐ' + colors.END)
-        or board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓜ' + colors.END)
-        or board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓓ' + colors.END)
-        or board[vertical_pos][horizontal_pos] == (colors.GOLD + 'Ⓖ' + colors.END)
-        ):
-        ask_question('medium', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, dragon_loot)
-        horizontal_pos += 1
 
-    if (board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓐ' + colors.END)
-        or board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓜ' + colors.END)
-        or board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓓ' + colors.END)
-        or board[vertical_pos][horizontal_pos] == (colors.ELITE + 'Ⓖ' + colors.END)
-        ):
-        ask_question('hard', easy_questions, medium_questions, hard_questions,
-                        easy_answers, medium_answers, hard_answers, dragon_loot)
+    current_pos = board[vertical_pos][horizontal_pos]
+    if current_pos == (colors.SILVER + 'Ⓐ' + colors.END):
+        ask_question('easy', 'att', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.SILVER + 'Ⓜ' + colors.END):
+        ask_question('easy', 'mid', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.SILVER + 'Ⓓ' + colors.END):
+        ask_question('easy', 'deff', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.SILVER + 'Ⓖ' + colors.END):
+        ask_question('easy', 'gk', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.GOLD + 'Ⓐ' + colors.END):
+        ask_question('medium', 'att', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.GOLD + 'Ⓜ' + colors.END):
+        ask_question('medium', 'mid', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.GOLD + 'Ⓓ' + colors.END):
+        ask_question('medium', 'deff', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.GOLD + 'Ⓖ' + colors.END):
+        ask_question('medium', 'gk', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.ELITE + 'Ⓐ' + colors.END):
+        ask_question('hard', 'att', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.ELITE + 'Ⓜ' + colors.END):
+        ask_question('hard', 'mid', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.ELITE + 'Ⓓ' + colors.END):
+        ask_question('hard', 'deff', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+        horizontal_pos += 1
+    elif current_pos == (colors.ELITE + 'Ⓖ' + colors.END):
+        ask_question('hard', 'gk', easy_questions, medium_questions, hard_questions,
+                        easy_answers, medium_answers, hard_answers, reserve_players)
+
         horizontal_pos += 1
 
     return horizontal_pos
@@ -359,9 +418,12 @@ def main():
     positions_list = []
     tiers_list = []
 
+    #creating list of our collected players
+    reserve_players = []
+
 
     while footballers_amount < 30:
-        footballer_x = randint(2, 129)
+        footballer_x = randint(2, 149)
         footballer_y = randint(2, height-2)
 
         if (board[footballer_y-1][footballer_x] == " " and
@@ -407,7 +469,7 @@ def main():
                 inventory_board[5][5] = "x"
                 print_board(inventory_board)
 
-                
+
                 if pressed_key == 'x':
                     exit()
 
@@ -417,11 +479,13 @@ def main():
 
 
         generate_footballers(xx, yy, board, positions_list, tiers_list)
-        horizontal_pos = generate_question(board,vertical_pos, horizontal_pos, dragon_loot)
+
+        horizontal_pos = generate_question(board,vertical_pos, horizontal_pos, reserve_players)
+
 
 
         print_board(board)
-        print(vertical_pos, horizontal_pos)
+        print(reserve_players)
 
 
 main()
