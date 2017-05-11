@@ -616,7 +616,7 @@ def main():
     reserve_players = []
     starting_11 = []
 
-    horizontal_pos  = 15
+    horizontal_pos  = 2
     vertical_pos = height//2
 
 
