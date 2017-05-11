@@ -39,7 +39,7 @@ def load_footballer(position, tier):
     """
     with open ('footballers.csv', 'r') as file:
         footballers_temp = file.readlines()
-        
+
     footballers = []
     for line in footballers_temp:
         line = line.rstrip()
@@ -60,6 +60,7 @@ def load_footballer(position, tier):
         loaded_footballer.append(str(randint(85,99)))
 
     return loaded_footballer
+
 
 def getch():
     import sys, tty, termios
@@ -90,6 +91,132 @@ def create_first_board(width, height, sign):
 
     return board
 
+
+def insert_items_from_backpack(backpack, inventory_board, pos_x=5, pos_y=5):
+
+    for y in range(len(backpack)):
+        record = backpack[y][0]+" "+backpack[y][1]+" "+backpack[y][2]+" "+str(backpack[y][3])
+        for x in range(len(record)):
+            inventory_board[y+pos_y][x+pos_x] = record[x]
+
+    return inventory_board
+
+def create_inventory_board(width, height):
+    inventory_board = []
+
+    for row in range(height):
+        temporary_storage = []
+
+        for column in range(width):
+            if row == 0 or row == (height - 1) or row == 6:
+                temporary_storage.append("_")
+            else:
+                if column == 0 or column == (width - 1) or column == int(width/2):
+                    temporary_storage.append("|")
+                else:
+                    temporary_storage.append(" ")
+
+        inventory_board.append(temporary_storage)
+
+    return inventory_board
+
+
+def highest_length_of_item_inside_list(stuff):
+
+    longest_chain_of_items = 0
+
+    for items_list in stuff:
+        temporary_value = 0
+
+        for item in items_list:
+            temporary_value += len(str(item))
+
+        if temporary_value > longest_chain_of_items:
+            longest_chain_of_items = temporary_value
+
+    return longest_chain_of_items
+
+def find_longest_item(*data_space):
+    data_space = list(data_space)
+    longest = 0
+
+    for item in data_space:
+        if highest_length_of_item_inside_list(item) > longest:
+            longest = highest_length_of_item_inside_list(item)
+
+    return longest
+
+
+def handle_backpack(main_footballers_list, sub_footballers_list):
+
+    longest_item = find_longest_item(main_footballers_list, sub_footballers_list)
+
+    backpack_height = int((len(main_footballers_list) + len(sub_footballers_list)) * 1.8) + 10
+    backpack_width = longest_item * 4
+
+    inventory_board = create_inventory_board(backpack_width, backpack_height)
+
+    middle_point = int((backpack_width) / 2)
+    space_between_backpacks = int((middle_point - longest_item) / 2)
+    main_backpack = space_between_backpacks
+    minor_backpack = middle_point+space_between_backpacks
+
+    insert_items_from_backpack(main_footballers_list, inventory_board, main_backpack, 8)
+    insert_items_from_backpack(sub_footballers_list, inventory_board, minor_backpack, 8)
+
+    return inventory_board, main_footballers_list, sub_footballers_list, middle_point
+
+
+def insert_stressed_line(inventory_board, vertical, horizontal ):
+    inventory_board[vertical][horizontal] = "A"
+
+    return inventory_board
+
+
+def stress_line_up(pressed_key, vertical, horizontal, length_main, length_sub, middle_point):
+
+    if horizontal == 1:
+        if pressed_key == "w" and vertical > 8:
+            vertical -= 1
+        elif pressed_key == "s" and vertical < 7 + length_main:
+            vertical += 1
+
+    if horizontal == (middle_point+1):
+        if pressed_key == "w" and vertical > 8:
+            vertical -= 1
+        elif pressed_key == "s" and vertical < 7 + length_sub:
+            vertical += 1
+
+    return vertical, horizontal
+
+
+def exchange_items_between_backpacks(vertical, horizontal, middle_point, main_list, sub_list):
+    if horizontal == 1:
+        if main_list:
+            footballer = main_list.pop(vertical - 8)
+            sub_list.append(footballer)
+
+    elif horizontal == (middle_point + 1):
+        if sub_list:
+            footballer = sub_list.pop(vertical - 8)
+            main_list.append(footballer)
+
+    if vertical > 8:
+        vertical -= 1
+
+    return vertical, main_list, sub_list
+def input_and_refresh_backpacks(pressed_key, counter):
+
+    if counter % 2 == 0:    # counter to pass two runs at once by the main inventory loop
+        pressed_key = getch()
+    else:
+        pressed_key = None
+    counter += 1
+    os.system('clear')
+
+    return pressed_key, counter
+
+
 def create_building(box_range, board, pos_x=0, pos_y=0):
 
     for x in range(0, box_range):
@@ -103,6 +230,53 @@ def create_building(box_range, board, pos_x=0, pos_y=0):
                     board[x + pos_x][y + pos_y] = '\033[30m' + '.' + '\33[37m'
     return board
 
+def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key):
+    stressed_line_horizontal_pos = 1
+    stressed_line_vertical_pos = 8
+    counter = 2
+    inventory_opened = True
+
+    if main_footballers_list or sub_footballers_list:
+        while inventory_opened:
+
+            (inventory_board,
+            main_footballers_list,
+            sub_footballers_list,
+            middle_point) = handle_backpack(main_footballers_list, sub_footballers_list)
+
+            pressed_key, counter = input_and_refresh_backpacks(pressed_key, counter) # pass loop one more time at once
+
+            if pressed_key in ["w", "s"]:  # move through backpack
+
+                stressed_line_vertical_pos, stressed_line_horizontal_pos = stress_line_up(pressed_key,
+                                                                            stressed_line_vertical_pos,
+                                                                            stressed_line_horizontal_pos,
+                                                                            len(main_footballers_list),
+                                                                            len(sub_footballers_list),
+                                                                            middle_point)
+            elif pressed_key == "d":     # Go Through sub_backpack
+                stressed_line_horizontal_pos = middle_point+1
+
+            elif pressed_key == "a":     # Go through main_backpack
+                stressed_line_horizontal_pos = 1
+
+            elif pressed_key == " ":  # move items between backpacks
+                (stressed_line_vertical_pos,
+                 main_footballers_list,
+                  sub_footballers_list) = exchange_items_between_backpacks(
+                                            stressed_line_vertical_pos,
+                                            stressed_line_horizontal_pos,
+                                            middle_point, main_footballers_list,
+                                            sub_footballers_list)
+            elif pressed_key == 'x':
+                exit()
+
+            insert_stressed_line(inventory_board, stressed_line_vertical_pos, stressed_line_horizontal_pos)
+            print_board(inventory_board)
+
+            if pressed_key == 'i':  # Get out of the backpacks to game view
+                inventory_opened = False
+                os.system('clear')
 
 def create_random_amount_of_buildings(board):
     for buildings in range(501):
@@ -174,6 +348,8 @@ def insert_player(board, pos_x, pos_y, old_h, old_v ):
     board[pos_y][pos_x] = '@'
     return board
 
+
+
 def show_welcome():
 
     welcome = [
@@ -215,6 +391,7 @@ def show_welcome():
         sleep(0.2)
     print("Welcome to the Final Fantasy Football Game!")
     sleep(1)
+
 
 
 def hero_walking(pressed_key, board, h_position, v_position):
@@ -267,10 +444,15 @@ def generate_footballers(xx, yy, board, positions_list, tiers_list):
     return board
 
 
+
 def load_data(filename):
     with open (filename, 'r') as file:
             content = file.readlines()
     return content
+
+
+
+
 
 
 def ask_question(position, tier, reserve_players):
@@ -283,6 +465,7 @@ def ask_question(position, tier, reserve_players):
     easy_answers = load_data('easy_answers.csv')
     medium_answers = load_data('medium_answers.csv')
     hard_answers = load_data('hard_answers.csv')
+
 
     if tier == 'SILVER':
         random_digit = randint(0,len(easy_questions) - 1)
@@ -318,7 +501,7 @@ def ask_question(position, tier, reserve_players):
 
 def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
 
-    dictionary = { 
+    dictionary = {
                     colors.SILVER + 'Ⓐ' + colors.END : ['att','SILVER'],
                     colors.SILVER + 'Ⓜ' + colors.END : ['mid','SILVER'],
                     colors.SILVER + 'Ⓓ' + colors.END : ['deff','SILVER'],
@@ -334,6 +517,7 @@ def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
                     }
 
     current_pos = board[vertical_pos][horizontal_pos]
+
     if current_pos in dictionary:
         position = dictionary[current_pos][0]
         tier = dictionary[current_pos][1]
@@ -362,7 +546,24 @@ def insert_string_into_board(string, board, line_number, row_number):
         board[line_number][row_number+ letter ] = string[letter]
     return board
 
-def print_squad(board, players_list,text, line_number, row_number = 155):
+def clear_board_statistics(board):
+    line_iterator = 0
+    for line in board:
+        row_iterator = 0
+        if line_iterator > 2 and line_iterator < 48:
+            for row in line:
+                if row_iterator > 150 and row_iterator < 188:
+                    board[line_iterator][row_iterator] = ' '
+                row_iterator += 1
+        line_iterator += 1
+
+    return board
+
+
+
+
+
+def insert_squad_into_board(board, players_list,text, line_number, row_number = 155):
     """
     printing list of reserved players starting from [line_number] line
 
@@ -378,7 +579,6 @@ def print_squad(board, players_list,text, line_number, row_number = 155):
         if players_list_iterator <= len(players_list) :
             string = turn_into_string(players_list[players_list_iterator -1])
             insert_string_into_board(string, board, line_number, row_number)
-
         line_number += 1
         players_list_iterator += 1
 
@@ -389,6 +589,9 @@ def main():
 
     width = 200
     height = 50
+
+    reserve_players = []
+    starting_11 = []
 
     horizontal_pos  = width//2
     vertical_pos = height//2
@@ -409,7 +612,6 @@ def main():
     tiers_list = []
 
     #creating list of our collected players
-    reserve_players = []
 
 
     while footballers_amount < 30:
@@ -429,13 +631,15 @@ def main():
             footballers_amount += 1
 
     while True:
+
+
+
         print()
 
         pressed_key = getch()
 
         os.system('clear')
 
-        board = board_with_buildings
 
         old_horizontal = horizontal_pos
         old_vertical = vertical_pos
@@ -444,17 +648,23 @@ def main():
         elif pressed_key == 'x':
             exit()
 
-        player = insert_player(board, horizontal_pos, vertical_pos, old_horizontal, old_vertical)
+
+#-----------------------------------------------------------------------
+        elif pressed_key == 'i':
+            inventory_main_view(starting_11, reserve_players, pressed_key)
+            clear_board_statistics(board)
+#---------------------------------------------------------------------------------------
+        insert_player(board, horizontal_pos, vertical_pos, old_horizontal, old_vertical)
 
         generate_footballers(xx, yy, board, positions_list, tiers_list)
         horizontal_pos = generate_question(board,vertical_pos, horizontal_pos, reserve_players)
 
-        starting_11 = (('messi', 'att', 'ELITE', '99'), ('ronaldo', 'att', 'ELITE', '98'))
+        insert_squad_into_board(board,reserve_players,'COLLECTED PLAYERS', 5)
+        insert_squad_into_board(board,starting_11,'STARTING 11', 35)
 
-        print_squad(board,reserve_players,'COLLECTED PLAYERS', 5)
-        print_squad(board,starting_11,'STARTING 11', 35)
+
         print_board(board)
-        print(reserve_players)
+
 
 
 main()
