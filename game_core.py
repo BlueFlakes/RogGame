@@ -116,11 +116,11 @@ def load_footballer(position, tier):
     loaded_footballer = random.choice(footballers_to_pick)
 
     if tier == 'SILVER':
-        loaded_footballer.append(str(randint(55,70)))
+        loaded_footballer.append(str(randint(50, 65)))
     elif tier == 'GOLD':
-        loaded_footballer.append(str(randint(70,85)))
+        loaded_footballer.append(str(randint(70, 85)))
     elif tier == 'ELITE':
-        loaded_footballer.append(str(randint(85,99)))
+        loaded_footballer.append(str(randint(90, 99)))
 
     return loaded_footballer
 
