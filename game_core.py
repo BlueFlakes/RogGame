@@ -146,6 +146,21 @@ def find_longest_item(*data_space):
 
     return longest
 
+def insert_subtitles_into_backpacks(inventory_board, middle_point):
+    subtitles = ["Starting 11", "Reserve Players"]
+
+    for y in range(len(subtitles)):
+        left_and_right_bottom_space_to_centralize = int((middle_point - len(subtitles[y])) / 2)
+
+        for x in range(len(subtitles[y])):
+            if y == 0:
+                start_index = middle_point - len(subtitles[y]) - left_and_right_bottom_space_to_centralize
+            elif y == 1:
+                start_index = middle_point + left_and_right_bottom_space_to_centralize
+
+            inventory_board[3][x+ start_index] = subtitles[y][x]
+
+    return inventory_board
 
 def handle_backpack(main_footballers_list, sub_footballers_list):
 
@@ -161,6 +176,7 @@ def handle_backpack(main_footballers_list, sub_footballers_list):
     main_backpack = space_between_backpacks
     minor_backpack = middle_point+space_between_backpacks
 
+    insert_subtitles_into_backpacks(inventory_board, middle_point)
     insert_items_from_backpack(main_footballers_list, inventory_board, main_backpack, 8)
     insert_items_from_backpack(sub_footballers_list, inventory_board, minor_backpack, 8)
 
