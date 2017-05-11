@@ -32,6 +32,69 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 '''
+
+from random import randint
+
+def cold_hot_game(lifes):
+    
+    while True:
+
+        print('''I am thinking of a 3-digit number. Try to guess what it is.
+
+    Here are some clues:
+
+    When I say:    That means:
+
+    Cold       No digit is correct.
+    
+    Warm       One digit is correct but in the wrong position.
+
+    Hot        One digit is correct and in the right position.
+
+    I have thought up a number. ''')
+        print('You have ' + str(lifes) + 'lifes!')
+
+        counter = 1
+        random_numb = str(randint(100,999))
+        print('(' + random_numb + '#DEVELOPERS CODE)') #CODE
+        while counter <= int(lifes):
+            try:
+                number = int(input('\n Guess #' + str(counter) + ' : '))
+            except:
+                pass
+            # checking if input is correct
+            if len(str(number)) != 3:
+                print('Wrong number typed, try again with 3 digit number: ')
+            # checking if we won
+            elif number == int(random_numb):
+                print('''Hot Hot Hot
+                You got it!
+                        ''')
+                counter == 11
+                again = input('Do you want to play again? [yes/no]')
+                if again == 'yes':
+                    counter = 1
+                    break
+                else:
+                    return None
+            # checking similarity of typed number and random number
+            else:
+                char_iterator = 0
+                char_guessed = 0
+                for char in str(number):
+                    if char in random_numb:
+                        char_guessed += 1
+                        if char in random_numb[char_iterator]:
+                            print('hot', end =' ')
+                        else:
+                            print('warm', end =' ')
+                    char_iterator += 1
+                if char_guessed == 0:
+                    print('cold')
+                counter += 1
+            print(random_numb)
+
+
 def load_footballer(position, tier):
     """
     position: att, mid, deff, gk
@@ -301,6 +364,8 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
             if pressed_key == 'i':  # Get out of the backpacks to game view
                 inventory_opened = False
                 os.system('clear')
+                if len(main_footballers_list) == 11:
+                    cold_hot_game('10')
 
 def create_random_amount_of_buildings(board):
     for buildings in range(501):
@@ -477,6 +542,18 @@ def load_data(filename):
             content = file.readlines()
     return content
 
+############## fasol
+def search_for_best_player(players_list):
+    best_overall = 0
+    player_index = 0
+    for player in players_list:
+        if int(player[3]) > best_overall:
+            best_overall = int(player[3])
+            best_player_index = player_index
+        player_index += 1
+
+    return best_player_index
+#################
 
 def ask_question(position, tier, reserve_players):
     """
@@ -491,7 +568,7 @@ def ask_question(position, tier, reserve_players):
 
     if tier == 'SILVER':
         random_digit = randint(0,len(easy_questions) - 1)
-        print("If you answer this question, you get random SILVER player!")
+        print("If you answer this question, you get random SILVER player!" + "\n" + "If you fail, nothing happens :)")
         print(easy_answers[random_digit]) #CODE
         answer = input(easy_questions[random_digit])
 
@@ -500,7 +577,7 @@ def ask_question(position, tier, reserve_players):
 
     if tier == 'GOLD':
         random_digit = randint(0,len(medium_questions) - 1)
-        print("If you answer this question, you get random GOLD player!")
+        print("If you answer this question, you get random GOLD player!" + "\n" + "If you fail, you loose random player from your backpack! :)")
         print(medium_answers[random_digit]) #CODE
         answer = input(medium_questions[random_digit])
 
@@ -511,14 +588,15 @@ def ask_question(position, tier, reserve_players):
 
     if tier == 'ELITE':
         random_digit = randint(0,len(hard_questions) - 1)
-        print("If you answer this question, you get random ELITE player!")
+        print("If you answer this question, you get random ELITE player!" + "\n" + "If you fail, you loose the BEST PLAYER from your backpack, be aware!! :)")
         print(hard_answers[random_digit]) #CODE
         answer = input(hard_questions[random_digit])
 
         if answer == hard_answers[random_digit].lower().rstrip():
             reserve_players.append(load_footballer(position, 'ELITE'))
-        else:
-            pass
+        elif len(reserve_players) > 0:
+            best_player = reserve_players[search_for_best_player(reserve_players)]
+            reserve_players.remove(best_player)
 
 
 def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
@@ -545,6 +623,7 @@ def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
         tier = dictionary[current_pos][1]
         ask_question(position, tier, reserve_players)
         horizontal_pos += 1
+        clear_board_statistics(board)
 
     return horizontal_pos
 
@@ -618,7 +697,10 @@ def main():
 
     horizontal_pos  = 15
     vertical_pos = height//2
-
+######################################## fasol
+    level = [1, 2, 3, 4]
+    boss_overall = [60, 70, 80, 90]
+########################################
 
     board = create_first_board(width, height, ' ')
     board_with_buildings = create_random_amount_of_buildings(board) # added buildings to map
@@ -684,6 +766,7 @@ def main():
 
         insert_reserve_players_amount(board,reserve_players)
         insert_squad_into_board(board,starting_11,'STARTING 11', 5)
+        insert_squad_into_board(board,reserve_players,'COLLECTED PLAYERS', 20)
 
 
         print_board(board)
