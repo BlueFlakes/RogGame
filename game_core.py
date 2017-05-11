@@ -33,8 +33,6 @@ def getch():
     return ch
 '''
 
-from random import randint
-
 def cold_hot_game(lifes):
     
     while True:
@@ -61,7 +59,7 @@ def cold_hot_game(lifes):
             try:
                 number = int(input('\n Guess #' + str(counter) + ' : '))
             except:
-                pass
+                number = 0
             # checking if input is correct
             if len(str(number)) != 3:
                 print('Wrong number typed, try again with 3 digit number: ')
@@ -73,10 +71,12 @@ def cold_hot_game(lifes):
                 counter == 11
                 again = input('Do you want to play again? [yes/no]')
                 if again == 'yes':
+                    random_numb = str(randint(100,999))
                     counter = 1
-                    break
                 else:
+                    os.system("clear")
                     return None
+
             # checking similarity of typed number and random number
             else:
                 char_iterator = 0
@@ -93,6 +93,9 @@ def cold_hot_game(lifes):
                     print('cold')
                 counter += 1
             print(random_numb)
+        print("GAME OVER")
+        sleep(5)
+        exit()
 
 
 def load_footballer(position, tier):
@@ -315,7 +318,7 @@ def create_building(box_range, board, pos_x=0, pos_y=0):
                     board[x + pos_x][y + pos_y] = '\033[30m' + '.' + '\33[37m'
     return board
 
-def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key):
+def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key, level, boss_overall):
     stressed_line_horizontal_pos = 1
     stressed_line_vertical_pos = 8
     counter = 2
@@ -364,8 +367,23 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
             if pressed_key == 'i':  # Get out of the backpacks to game view
                 inventory_opened = False
                 os.system('clear')
-                if len(main_footballers_list) == 11:
-                    cold_hot_game('10')
+                if len(main_footballers_list) == 3:
+                    overall = calculate_ovr(main_footballers_list)
+                    if overall >= boss_overall:
+                        cold_hot_game('10')
+                        main_footballers_list = [] 
+                        sub_footballers_list = []
+                        level += 1
+                        boss_overall += 8
+                        return level, boss_overall
+                        ###################
+                    else:
+                        print('YOUR OVERALL IS TOO LOW, I DONT WANT TO PLAY A GAME WITH YOU! \n GAME OVER SCREEN')
+                        sleep(5)
+                        exit()
+                        return level, boss_overall
+                        ##################
+
 
 def create_random_amount_of_buildings(board):
     for buildings in range(501):
@@ -698,8 +716,8 @@ def main():
     horizontal_pos  = 15
     vertical_pos = height//2
 ######################################## fasol
-    level = [1, 2, 3, 4]
-    boss_overall = [60, 70, 80, 90]
+    level = 1
+    boss_overall = 65
 ########################################
 
     board = create_first_board(width, height, ' ')
@@ -756,7 +774,7 @@ def main():
 
 #-----------------------------------------------------------------------
         elif pressed_key == 'i':
-            inventory_main_view(starting_11, reserve_players, pressed_key)
+            level, boss_overall = inventory_main_view(starting_11, reserve_players, pressed_key, level, boss_overall)
             clear_board_statistics(board)
 #---------------------------------------------------------------------------------------
         insert_player(board, horizontal_pos, vertical_pos, old_horizontal, old_vertical)
@@ -767,9 +785,15 @@ def main():
         insert_reserve_players_amount(board,reserve_players)
         insert_squad_into_board(board,starting_11,'STARTING 11', 5)
         insert_squad_into_board(board,reserve_players,'COLLECTED PLAYERS', 20)
+        insert_string_into_board('LEVEL: ' + str(level), board, 45, 155)
+        insert_string_into_board('BOSS OVERALL: ' + str(boss_overall), board, 46, 155)
 
 
         print_board(board)
+        print(reserve_players)
+        print(starting_11)
+        print(level)
+        print(boss_overall)
 
 
 
