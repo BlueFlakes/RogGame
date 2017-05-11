@@ -80,10 +80,9 @@ def create_first_board(width, height, sign):
 
         for column in range(width-1):
             if row == 0 or row == (height - 1):
-                if column <=150:
-                    item_in_row.append("#")
+                item_in_row.append("#")
             else:
-                if column == 0 or column == 150:
+                if column == 0 or column == 150 or column == 198:
                     item_in_row.append("#")
                 else:
                     item_in_row.append(sign)
@@ -287,7 +286,7 @@ def ask_question(position, tier, reserve_players):
 
     if tier == 'SILVER':
         random_digit = randint(0,len(easy_questions) - 1)
-        print("If you answer this question, you get random SILVER player!" + "\n" + "If you fail, nothing happens!" + "\n")
+        print("If you answer this question, you get random SILVER player!")
         print(easy_answers[random_digit]) #CODE
         answer = input(easy_questions[random_digit])
 
@@ -296,21 +295,25 @@ def ask_question(position, tier, reserve_players):
 
     if tier == 'GOLD':
         random_digit = randint(0,len(medium_questions) - 1)
-        print("If you answer this question, you get random GOLD player!" + "\n" + "If you fail, you will loose random player!" + "\n")
+        print("If you answer this question, you get random GOLD player!")
         print(medium_answers[random_digit]) #CODE
         answer = input(medium_questions[random_digit])
 
         if answer == medium_answers[random_digit].lower().rstrip():
             reserve_players.append(load_footballer(position, 'GOLD'))
+        elif len(reserve_players) > 0:
+            reserve_players.remove(random.choice(reserve_players))
 
     if tier == 'ELITE':
         random_digit = randint(0,len(hard_questions) - 1)
-        print("If you answer this question, you get random ELITE player!" + "\n" + "If you fail, you will loose your BEST PLAYER!" + "\n")
+        print("If you answer this question, you get random ELITE player!")
         print(hard_answers[random_digit]) #CODE
         answer = input(hard_questions[random_digit])
 
         if answer == hard_answers[random_digit].lower().rstrip():
             reserve_players.append(load_footballer(position, 'ELITE'))
+        else:
+            pass
 
 
 def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
@@ -354,36 +357,37 @@ def calculate_ovr(players_list):
     else:
         return 0
 
-def print_squad(board, reserve_players, line_location):
+def insert_string_into_board(string, board, line_number, row_number):
+    for letter in range(len(string)):
+        board[line_number][row_number+ letter ] = string[letter]
+    return board
 
-    # printing list of reserved players starting from [line_number] line
-    line_number = line_location
-    board[line_number - 2][155] = 'COLLECTED PLAYERS:'
-    board[line_number - 1][155] = '(name position TIER OVR)'
+def print_squad(board, players_list,text, line_number, row_number = 155):
+    """
+    printing list of reserved players starting from [line_number] line
 
-    reserve_players_iterator = 0
+    text: title, e.g. 'STARTING 11' or ' COLLECTED PLAYERS'
+    players_list: a name of a variable containing our players(reserve_players or starting_11)'
+    """
+
+    title =  str(text) + '  (OVR = ' + str(calculate_ovr(players_list)) + ')'
+    insert_string_into_board(title, board, line_number -2, row_number)
+
+    players_list_iterator = 1
     for line in board:
-        row_number = 0
-        for row in line:
-            if row_number == 155:
-                if reserve_players_iterator <= len(reserve_players):
-                    board[line_number][row_number] = turn_into_string(reserve_players[reserve_players_iterator -1])
-            row_number += 1
+        if players_list_iterator <= len(players_list) :
+            string = turn_into_string(players_list[players_list_iterator -1])
+            insert_string_into_board(string, board, line_number, row_number)
+
         line_number += 1
-        reserve_players_iterator += 1
-    
-    board[23][155] = 'TOTAL OVR = ' + str(calculate_ovr(reserve_players))
-    # printing list of starting 11
-    board[25][155] = 'STARTING 11:'
-    
+        players_list_iterator += 1
 
     return board
 
 
-
 def main():
 
-    width = 180
+    width = 200
     height = 50
 
     horizontal_pos  = width//2
@@ -445,7 +449,10 @@ def main():
         generate_footballers(xx, yy, board, positions_list, tiers_list)
         horizontal_pos = generate_question(board,vertical_pos, horizontal_pos, reserve_players)
 
-        print_squad(board,reserve_players, 3)
+        starting_11 = (('messi', 'att', 'ELITE', '99'), ('ronaldo', 'att', 'ELITE', '98'))
+
+        print_squad(board,reserve_players,'COLLECTED PLAYERS', 5)
+        print_squad(board,starting_11,'STARTING 11', 35)
         print_board(board)
         print(reserve_players)
 
