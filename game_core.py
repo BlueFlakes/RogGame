@@ -367,22 +367,11 @@ def print_board(board):
             print(column, end = '')
         print()
 
-'''
-def print_part_of_board(board, vertical_pos, horizontal_pos):
-#    for row in board:
-#        for column in row:
-#            print(column, end = '')
-#        print()
 
 
-    for y in range(11):
-        for x in range(11):
-            print(board[y + vertical_pos - 5][x + horizontal_pos - 5], end="")
 
-        print()
-'''
-def insert_player(board, pos_x, pos_y, old_h, old_v ):
-    board[old_v][old_h] = " "
+def insert_player(board, pos_x, pos_y, old_h, old_v):
+    board[old_v][old_h] = ' '
     board[pos_y][pos_x] = '@'
     return board
 
@@ -489,10 +478,6 @@ def load_data(filename):
     return content
 
 
-
-
-
-
 def ask_question(position, tier, reserve_players):
     """
     tier: SILVER, GOLD, ELITE
@@ -503,7 +488,6 @@ def ask_question(position, tier, reserve_players):
     easy_answers = load_data('easy_answers.csv')
     medium_answers = load_data('medium_answers.csv')
     hard_answers = load_data('hard_answers.csv')
-
 
     if tier == 'SILVER':
         random_digit = randint(0,len(easy_questions) - 1)
@@ -598,9 +582,6 @@ def clear_board_statistics(board):
     return board
 
 
-
-
-
 def insert_squad_into_board(board, players_list,text, line_number, row_number = 155):
     """
     printing list of reserved players starting from [line_number] line
@@ -622,7 +603,11 @@ def insert_squad_into_board(board, players_list,text, line_number, row_number = 
 
     return board
 
+def insert_reserve_players_amount(board, reserve_footballers_list):
+    reserve_footballers_amount = "Reserve players amount: " + str(len(reserve_footballers_list))
+    insert_string_into_board(reserve_footballers_amount, board, 17, 155)
 
+    return board
 def main():
 
     width = 200
@@ -631,7 +616,7 @@ def main():
     reserve_players = []
     starting_11 = []
 
-    horizontal_pos  = 3
+    horizontal_pos  = 15
     vertical_pos = height//2
 
 
@@ -697,12 +682,12 @@ def main():
         generate_footballers(xx, yy, board, positions_list, tiers_list)
         horizontal_pos = generate_question(board,vertical_pos, horizontal_pos, reserve_players)
 
-        insert_squad_into_board(board,reserve_players,'COLLECTED PLAYERS', 5)
-        insert_squad_into_board(board,starting_11,'STARTING 11', 35)
+        insert_reserve_players_amount(board,reserve_players)
+        insert_squad_into_board(board,starting_11,'STARTING 11', 5)
 
 
         print_board(board)
-#        print_part_of_board(board, vertical_pos, horizontal_pos)
+
 
 
 main()
