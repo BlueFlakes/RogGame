@@ -197,12 +197,16 @@ def exchange_items_between_backpacks(vertical, horizontal, middle_point, main_li
             sub_list.append(footballer)
 
     elif horizontal == (middle_point + 1):
-        if sub_list:
+        if len(main_list) < 11 and sub_list:
             footballer = sub_list.pop(vertical - 8)
             main_list.append(footballer)
 
     if vertical > 8:
-        vertical -= 1
+        if horizontal == (middle_point+1) and len(main_list) != 11:
+            vertical -= 1
+        elif horizontal == 1:
+            vertical -= 1
+
 
     return vertical, main_list, sub_list
 def input_and_refresh_backpacks(pressed_key, counter):
@@ -343,6 +347,19 @@ def print_board(board):
             print(column, end = '')
         print()
 
+'''
+def print_part_of_board(board):
+#    for row in board:
+#        for column in row:
+#            print(column, end = '')
+#        print()
+    for y in range(49):
+        for x in range(49):
+            print(board[y][x], end="")
+
+
+        print()
+'''
 def insert_player(board, pos_x, pos_y, old_h, old_v ):
     board[old_v][old_h] = " "
     board[pos_y][pos_x] = '@'
@@ -527,7 +544,7 @@ def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
     return horizontal_pos
 
 def turn_into_string(input_list):
-    
+
     string = ' '.join(input_list)
     return string
 
