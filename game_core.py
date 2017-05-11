@@ -367,7 +367,7 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
             if pressed_key == 'i':  # Get out of the backpacks to game view
                 inventory_opened = False
                 os.system('clear')
-                if len(main_footballers_list) == 11:
+                if len(main_footballers_list) == 3:
                     overall = calculate_ovr(main_footballers_list)
                     if overall >= boss_overall:
                         cold_hot_game('10')
@@ -382,7 +382,8 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
                         sleep(5)
                         exit()
                         return level, boss_overall
-                        ##################
+                        #################
+                return level, boss_overall
 
 
 def create_random_amount_of_buildings(board, reserved_sign):
