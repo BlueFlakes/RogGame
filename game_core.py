@@ -206,16 +206,18 @@ def stress_line_up(pressed_key, vertical, horizontal, length_main, length_sub, m
     return vertical, horizontal
 
 
-def exchange_items_between_backpacks(vertical, horizontal, middle_point, main_list, sub_list):
-    if horizontal == 1:
-        if main_list:
-            footballer = main_list.pop(vertical - 8)
-            sub_list.append(footballer)
+def exchange_items_between_backpacks(vertical, horizontal, middle_point, main_list, sub_list, pressed_key):
 
-    elif horizontal == (middle_point + 1):
-        if len(main_list) < 11 and sub_list:
-            footballer = sub_list.pop(vertical - 8)
-            main_list.append(footballer)
+    if pressed_key == " ":
+        if horizontal == 1:
+            if main_list:
+                footballer = main_list.pop(vertical - 8)
+                sub_list.append(footballer)
+
+        elif horizontal == (middle_point + 1):
+            if len(main_list) < 11 and sub_list:
+                footballer = sub_list.pop(vertical - 8)
+                main_list.append(footballer)
 
     if vertical > 8:
         if horizontal == (middle_point+1) and len(main_list) != 11:
@@ -277,17 +279,19 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
             elif pressed_key == "d":     # Go Through sub_backpack
                 stressed_line_horizontal_pos = middle_point+1
 
+
+
             elif pressed_key == "a":     # Go through main_backpack
                 stressed_line_horizontal_pos = 1
 
-            elif pressed_key == " ":  # move items between backpacks
+            elif pressed_key == " " or pressed_key == "-":  # move items between backpacks
                 (stressed_line_vertical_pos,
                  main_footballers_list,
                   sub_footballers_list) = exchange_items_between_backpacks(
                                             stressed_line_vertical_pos,
                                             stressed_line_horizontal_pos,
                                             middle_point, main_footballers_list,
-                                            sub_footballers_list)
+                                            sub_footballers_list, pressed_key)
             elif pressed_key == 'x':
                 exit()
 
@@ -364,15 +368,16 @@ def print_board(board):
         print()
 
 '''
-def print_part_of_board(board):
+def print_part_of_board(board, vertical_pos, horizontal_pos):
 #    for row in board:
 #        for column in row:
 #            print(column, end = '')
 #        print()
-    for y in range(49):
-        for x in range(49):
-            print(board[y][x], end="")
 
+
+    for y in range(11):
+        for x in range(11):
+            print(board[y + vertical_pos - 5][x + horizontal_pos - 5], end="")
 
         print()
 '''
@@ -626,7 +631,7 @@ def main():
     reserve_players = []
     starting_11 = []
 
-    horizontal_pos  = width//2
+    horizontal_pos  = 3
     vertical_pos = height//2
 
 
@@ -697,7 +702,7 @@ def main():
 
 
         print_board(board)
-
+#        print_part_of_board(board, vertical_pos, horizontal_pos)
 
 
 main()
