@@ -14,7 +14,7 @@ class colors:
     END = '\x1b[0m'
 
 
-reserved_sign = ["#", '\033[92m' + '#' + '\33[37m', "@"]
+
 
 
 '''
@@ -34,7 +34,7 @@ def getch():
 '''
 
 def cold_hot_game(lifes):
-    
+
     while True:
 
         print('''I am thinking of a 3-digit number. Try to guess what it is.
@@ -44,7 +44,7 @@ def cold_hot_game(lifes):
     When I say:    That means:
 
     Cold       No digit is correct.
-    
+
     Warm       One digit is correct but in the wrong position.
 
     Hot        One digit is correct and in the right position.
@@ -119,11 +119,11 @@ def load_footballer(position, tier):
     loaded_footballer = random.choice(footballers_to_pick)
 
     if tier == 'SILVER':
-        loaded_footballer.append(str(randint(55,70)))
+        loaded_footballer.append(str(randint(50, 65)))
     elif tier == 'GOLD':
-        loaded_footballer.append(str(randint(70,85)))
+        loaded_footballer.append(str(randint(70, 85)))
     elif tier == 'ELITE':
-        loaded_footballer.append(str(randint(85,99)))
+        loaded_footballer.append(str(randint(90, 99)))
 
     return loaded_footballer
 
@@ -305,7 +305,7 @@ def input_and_refresh_backpacks(pressed_key, counter):
     return pressed_key, counter
 
 
-def create_building(box_range, board, pos_x=0, pos_y=0):
+def create_building(box_range, board, reserved_sign, pos_x=0, pos_y=0):
 
     for x in range(0, box_range):
         for y in range(0, box_range):
@@ -385,7 +385,7 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
                         ##################
 
 
-def create_random_amount_of_buildings(board):
+def create_random_amount_of_buildings(board, reserved_sign):
     for buildings in range(501):
         safe = True
         building_range = randrange(5, 12, 2)
@@ -438,7 +438,7 @@ def create_random_amount_of_buildings(board):
             safe = True
 
         if safe == True:
-            board = create_building(building_range, board, random_pos_y, random_pos_x)
+            board = create_building(building_range, board, reserved_sign, random_pos_y, random_pos_x)
 
     return board
 
@@ -504,7 +504,7 @@ def show_welcome():
 
 
 
-def hero_walking(pressed_key, board, h_position, v_position):
+def hero_walking(pressed_key, board, h_position, v_position, reserved_sign):
 
     if pressed_key == 'd' and board[v_position][h_position +1] not in reserved_sign:
         h_position += 1
@@ -700,31 +700,9 @@ def insert_squad_into_board(board, players_list,text, line_number, row_number = 
 
     return board
 
-def insert_reserve_players_amount(board, reserve_footballers_list):
-    reserve_footballers_amount = "Reserve players amount: " + str(len(reserve_footballers_list))
-    insert_string_into_board(reserve_footballers_amount, board, 17, 155)
 
-    return board
-def main():
+def amount_of_footballers(board, height):
 
-    width = 200
-    height = 50
-
-    reserve_players = []
-    starting_11 = []
-
-    horizontal_pos  = 15
-    vertical_pos = height//2
-######################################## fasol
-    level = 1
-    boss_overall = 65
-########################################
-
-    board = create_first_board(width, height, ' ')
-    board_with_buildings = create_random_amount_of_buildings(board) # added buildings to map
-    board = board_with_buildings
-
-    # creating lists of x,y coordinates for footballers generating
     xx = []
     yy = []
 
@@ -733,11 +711,11 @@ def main():
     tiers = [0, 1, 2]
     positions_list = []
     tiers_list = []
-
+    max_amount_of_footballers = randint(20, 30)
     #creating list of our collected players
 
 
-    while footballers_amount < 30:
+    while footballers_amount < max_amount_of_footballers:
         footballer_x = randint(2, 149)
         footballer_y = randint(2, height-2)
 
@@ -752,10 +730,37 @@ def main():
             tiers_list.append(random.choice(tiers))
 
             footballers_amount += 1
+    return xx, yy, positions_list, tiers_list
+
+
+def insert_reserve_players_amount(board, reserve_footballers_list):
+    reserve_footballers_amount = "Reserve players amount: " + str(len(reserve_footballers_list))
+    insert_string_into_board(reserve_footballers_amount, board, 17, 155)
+
+    return board
+def main():
+
+    width = 200
+    height = 50
+
+    reserve_players = []
+    starting_11 = []
+    reserved_sign = ["#", '\033[92m' + '#' + '\33[37m', "@"]
+    horizontal_pos  = 2
+    vertical_pos = height//2
+######################################## fasol
+    level = 1
+    boss_overall = 65
+########################################
+
+    board = create_first_board(width, height, ' ')
+    board_with_buildings = create_random_amount_of_buildings(board, reserved_sign) # added buildings to map
+    board = board_with_buildings
+
+    # creating lists of x,y coordinates for footballers generating
+    xx, yy, positions_list, tiers_list = amount_of_footballers(board, height)
 
     while True:
-
-
 
         print()
 
@@ -767,7 +772,7 @@ def main():
         old_horizontal = horizontal_pos
         old_vertical = vertical_pos
         if pressed_key in ['w','a','s','d']:
-            horizontal_pos, vertical_pos = hero_walking(pressed_key, board, horizontal_pos, vertical_pos)
+            horizontal_pos, vertical_pos = hero_walking(pressed_key, board, horizontal_pos, vertical_pos, reserved_sign)
         elif pressed_key == 'x':
             exit()
 
