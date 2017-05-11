@@ -367,7 +367,7 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
             if pressed_key == 'i':  # Get out of the backpacks to game view
                 inventory_opened = False
                 os.system('clear')
-                if len(main_footballers_list) == 3:
+                if len(main_footballers_list) == 11:
                     overall = calculate_ovr(main_footballers_list)
                     if overall >= boss_overall:
                         cold_hot_game('10')
