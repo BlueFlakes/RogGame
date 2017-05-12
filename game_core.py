@@ -34,7 +34,7 @@ def getch():
 '''
 
 def load_file_as_list(filename, separator):
-    """ 
+    """
     loads a file containing ascii graphics, and splits it by separator, returning list of strings
     """
 
@@ -46,7 +46,7 @@ def load_file_as_list(filename, separator):
 
 
 def intro(listed_file, message_time):
-    """ 
+    """
     prints intro
     listed_file = file containing list of intro messages (ascii art)
     """
@@ -118,8 +118,7 @@ def cold_hot_game(lifes):
                     print('cold')
                 counter += 1
             print(random_numb)
-        print("GAME OVER")
-        sleep(5)
+
         exit()
 
 
@@ -483,51 +482,6 @@ def insert_player(board, pos_x, pos_y, old_h, old_v):
     board[old_v][old_h] = ' '
     board[pos_y][pos_x] = '@'
     return board
-
-
-
-def show_welcome():
-
-    welcome = [
-
-
-"""                    __
-                 .-'||'-.
-               .'   ||   '.             HOCKEY: SUCKS
-              /   __||__   \
-\\
-              | /`-    -`\ |            OCCER: SUCKS
-              | | 6    6 | |
-              \/\____7___/\/            BASEBALL: SUCKS""",
-
-
-"""      .--------:\:I:II:I:/;--------.
-     /          \`:I::I:`/          \   BASKETBALL: SUCKS
-    |            `------'            |
-    |             \____/             |  CRICKET: SUCKS""",
-
-"""    |      ,    __     ___    ,      |
-    |======|   /  |   / _ \   |======|  RUGBY: SUCKS
-    |======|   ^| |  | | | |  |======|
-    |~~~~~|     | |  | |_| |   |~~~~~|  CURLING: SUCKS
-    |     |\   [___]  \___/   /|     |""",
-
-"""     \    \|                  |/    /
-     `\    \  _ _.-=""=-._ _  /    /'
-       `\   '`_)\\-++++-//(_`'   /'
-         ;   (__||      ||__)   ;       FOOTBALL: DOESN'T SUCK
-          ;   ___\      /___   ;
-           '. ---/-=..=-\--- .'         ANY QUESTIONS
-             `""`        `""`
-    """]
-
-
-    for item in welcome:
-        print(item)
-        sleep(0.2)
-    print("Welcome to the Final Fantasy Football Game!")
-    sleep(1)
-
 
 
 def hero_walking(pressed_key, board, h_position, v_position, reserved_sign):
