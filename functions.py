@@ -534,7 +534,7 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
                         print('YOUR OVERALL IS TOO LOW, I DONT WANT TO PLAY A GAME WITH YOU! \n')
                         print_game_over()
                         exit()
-                return level, boss_overall
+    return level, boss_overall
 
 
 def create_random_amount_of_buildings(board, reserved_sign, level):
