@@ -33,6 +33,31 @@ def getch():
     return ch
 '''
 
+def load_file_as_list(filename, separator):
+    """ 
+    loads a file containing ascii graphics, and splits it by separator, returning list of strings
+    """
+
+    ascii_file = open(filename)   # loading ascii graphic
+    listed_file = ascii_file.read()
+    listed_file = listed_file.split(separator)
+
+    return listed_file
+
+
+def intro(listed_file, message_time):
+    """ 
+    prints intro
+    listed_file = file containing list of intro messages (ascii art)
+    """
+    for iterator in range(len(listed_file)):   # Game Intro
+        print(chr(27) + "[2J")  # clear terminal screen
+        print(colors.GOLD + listed_file[iterator] + colors.END)
+        print(colors.ELITE + 'Press ENTER >>>'.rjust(200) + colors.END)
+        sleep(0.2)
+        input('')
+
+
 def cold_hot_game(lifes):
 
     while True:
@@ -50,7 +75,7 @@ def cold_hot_game(lifes):
     Hot        One digit is correct and in the right position.
 
     I have thought up a number. ''')
-        print('You have ' + str(lifes) + 'lifes!')
+        print('You have ' + str(lifes) + ' lifes!')
 
         counter = 1
         random_numb = str(randint(100,999))
@@ -212,8 +237,9 @@ def find_longest_item(*data_space):
 
     return longest
 
-def insert_subtitles_into_backpacks(inventory_board, middle_point):
-    subtitles = ["Starting 11", "Reserve Players"]
+def insert_subtitles_into_backpacks(inventory_board, middle_point, main_footballers_list):
+    subtitles = ["Starting 11", "Reserve Players", "OVR: " + str(calculate_ovr(main_footballers_list))]
+    vertical_index = 0
 
     for y in range(len(subtitles)):
         left_and_right_bottom_space_to_centralize = int((middle_point - len(subtitles[y])) / 2)
@@ -223,8 +249,12 @@ def insert_subtitles_into_backpacks(inventory_board, middle_point):
                 start_index = middle_point - len(subtitles[y]) - left_and_right_bottom_space_to_centralize
             elif y == 1:
                 start_index = middle_point + left_and_right_bottom_space_to_centralize
+            elif y == 2:
+                start_index = 16
+                vertical_index = 2
 
-            inventory_board[3][x+ start_index] = subtitles[y][x]
+
+            inventory_board[3 + vertical_index][x+ start_index] = subtitles[y][x]
 
     return inventory_board
 
@@ -242,9 +272,10 @@ def handle_backpack(main_footballers_list, sub_footballers_list):
     main_backpack = space_between_backpacks
     minor_backpack = middle_point+space_between_backpacks
 
-    insert_subtitles_into_backpacks(inventory_board, middle_point)
+    insert_subtitles_into_backpacks(inventory_board, middle_point, main_footballers_list)
     insert_items_from_backpack(main_footballers_list, inventory_board, main_backpack, 8)
     insert_items_from_backpack(sub_footballers_list, inventory_board, minor_backpack, 8)
+
 
     return inventory_board, main_footballers_list, sub_footballers_list, middle_point
 
@@ -305,7 +336,7 @@ def input_and_refresh_backpacks(pressed_key, counter):
     return pressed_key, counter
 
 
-def create_building(box_range, board, reserved_sign, pos_x=0, pos_y=0):
+def create_building(box_range, board, reserved_sign, level, pos_x=0, pos_y=0):
 
     for x in range(0, box_range):
         for y in range(0, box_range):
@@ -313,7 +344,7 @@ def create_building(box_range, board, reserved_sign, pos_x=0, pos_y=0):
                 board[x + pos_x][y + pos_y] = reserved_sign[1]
             else:
                 if y == 0 or y == box_range - 1:
-                    board[x + pos_x][y + pos_y] = reserved_sign[1]
+                    board[x + pos_x][y + pos_y] = reserved_sign[level]
                 else:
                     board[x + pos_x][y + pos_y] = '\033[30m' + '.' + '\33[37m'
     return board
@@ -367,26 +398,20 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
             if pressed_key == 'i':  # Get out of the backpacks to game view
                 inventory_opened = False
                 os.system('clear')
-                if len(main_footballers_list) == 3:
+                if len(main_footballers_list) == 11:
                     overall = calculate_ovr(main_footballers_list)
                     if overall >= boss_overall:
-                        cold_hot_game('10')
-                        main_footballers_list = [] 
-                        sub_footballers_list = []
+                        cold_hot_game( overall - boss_overall)
                         level += 1
-                        boss_overall += 8
-                        return level, boss_overall
-                        ###################
+                        boss_overall += 10
                     else:
                         print('YOUR OVERALL IS TOO LOW, I DONT WANT TO PLAY A GAME WITH YOU! \n GAME OVER SCREEN')
                         sleep(5)
                         exit()
-                        return level, boss_overall
-                        #################
                 return level, boss_overall
 
 
-def create_random_amount_of_buildings(board, reserved_sign):
+def create_random_amount_of_buildings(board, reserved_sign, level):
     for buildings in range(501):
         safe = True
         building_range = randrange(5, 12, 2)
@@ -439,7 +464,7 @@ def create_random_amount_of_buildings(board, reserved_sign):
             safe = True
 
         if safe == True:
-            board = create_building(building_range, board, reserved_sign, random_pos_y, random_pos_x)
+            board = create_building(building_range, board, reserved_sign, level, random_pos_y, random_pos_x)
 
     return board
 
@@ -574,7 +599,7 @@ def search_for_best_player(players_list):
     return best_player_index
 #################
 
-def ask_question(position, tier, reserve_players):
+def ask_question(position, tier, reserve_players,starting_11):
     """
     tier: SILVER, GOLD, ELITE
     """
@@ -602,6 +627,8 @@ def ask_question(position, tier, reserve_players):
 
         if answer == medium_answers[random_digit].lower().rstrip():
             reserve_players.append(load_footballer(position, 'GOLD'))
+        elif len(starting_11) > 0:
+            starting_11.remove(random.choice(starting_11))
         elif len(reserve_players) > 0:
             reserve_players.remove(random.choice(reserve_players))
 
@@ -613,12 +640,17 @@ def ask_question(position, tier, reserve_players):
 
         if answer == hard_answers[random_digit].lower().rstrip():
             reserve_players.append(load_footballer(position, 'ELITE'))
+        elif len(starting_11) > 0:
+            best_player = starting_11[search_for_best_player(starting_11)]
+            starting_11.remove(best_player)
         elif len(reserve_players) > 0:
             best_player = reserve_players[search_for_best_player(reserve_players)]
             reserve_players.remove(best_player)
 
 
-def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
+
+
+def generate_question(board,vertical_pos, horizontal_pos, reserve_players,starting_11):
 
     dictionary = {
                     colors.SILVER + 'Ⓐ' + colors.END : ['att','SILVER'],
@@ -640,7 +672,7 @@ def generate_question(board,vertical_pos, horizontal_pos, reserve_players):
     if current_pos in dictionary:
         position = dictionary[current_pos][0]
         tier = dictionary[current_pos][1]
-        ask_question(position, tier, reserve_players)
+        ask_question(position, tier, reserve_players,starting_11)
         horizontal_pos += 1
         clear_board_statistics(board)
 
@@ -746,60 +778,65 @@ def main():
 
     reserve_players = []
     starting_11 = []
-    reserved_sign = ["#", '\033[92m' + '#' + '\33[37m', "@"]
-    horizontal_pos  = 2
-    vertical_pos = height//2
+    reserved_sign = ["#", '\033[92m' + '#' + '\33[37m','\033[94m' + '#' + '\33[37m', '\033[93m' + '#' + '\33[37m',
+    '\033[95m' + '#' + '\33[37m','\033[96m' + '#' + '\33[37m', "@"]
+
 ######################################## fasol
     level = 1
-    boss_overall = 65
+    boss_overall = 60
 ########################################
+    intro(load_file_as_list('ascii_intro.txt', 'break'), 10)
 
-    board = create_first_board(width, height, ' ')
-    board_with_buildings = create_random_amount_of_buildings(board, reserved_sign) # added buildings to map
-    board = board_with_buildings
-
-    # creating lists of x,y coordinates for footballers generating
-    xx, yy, positions_list, tiers_list = amount_of_footballers(board, height)
-
-    while True:
-
-        print()
-
-        pressed_key = getch()
-
-        os.system('clear')
+    while level < 5:
+        change_board = False
+        horizontal_pos  = 2
+        vertical_pos = height//2
+        board = create_first_board(width, height, ' ')
+        board_with_buildings = create_random_amount_of_buildings(board, reserved_sign, level) # added buildings to map
+        board = board_with_buildings
+        # creating lists of x,y coordinates for footballers generating
+        xx, yy, positions_list, tiers_list = amount_of_footballers(board, height)
+        last_level = level
 
 
-        old_horizontal = horizontal_pos
-        old_vertical = vertical_pos
-        if pressed_key in ['w','a','s','d']:
-            horizontal_pos, vertical_pos = hero_walking(pressed_key, board, horizontal_pos, vertical_pos, reserved_sign)
-        elif pressed_key == 'x':
-            exit()
+        while not change_board:
+            print()
+
+            pressed_key = getch()
+
+            os.system('clear')
 
 
-#-----------------------------------------------------------------------
-        elif pressed_key == 'i':
-            level, boss_overall = inventory_main_view(starting_11, reserve_players, pressed_key, level, boss_overall)
-            clear_board_statistics(board)
-#---------------------------------------------------------------------------------------
-        insert_player(board, horizontal_pos, vertical_pos, old_horizontal, old_vertical)
-
-        generate_footballers(xx, yy, board, positions_list, tiers_list)
-        horizontal_pos = generate_question(board,vertical_pos, horizontal_pos, reserve_players)
-
-        insert_reserve_players_amount(board,reserve_players)
-        insert_squad_into_board(board,starting_11,'STARTING 11', 5)
-        insert_squad_into_board(board,reserve_players,'COLLECTED PLAYERS', 20)
-        insert_string_into_board('LEVEL: ' + str(level), board, 45, 155)
-        insert_string_into_board('BOSS OVERALL: ' + str(boss_overall), board, 46, 155)
+            old_horizontal = horizontal_pos
+            old_vertical = vertical_pos
+            if pressed_key in ['w','a','s','d']:
+                horizontal_pos, vertical_pos = hero_walking(pressed_key, board, horizontal_pos, vertical_pos, reserved_sign)
+            elif pressed_key == 'x':
+                exit()
 
 
-        print_board(board)
-        print(reserve_players)
-        print(starting_11)
-        print(level)
-        print(boss_overall)
+    #-----------------------------------------------------------------------
+            elif pressed_key == 'i':
+                level, boss_overall = inventory_main_view(starting_11, reserve_players, pressed_key, level, boss_overall)
+                clear_board_statistics(board)
+    #---------------------------------------------------------------------------------------
+            insert_player(board, horizontal_pos, vertical_pos, old_horizontal, old_vertical)
+
+            generate_footballers(xx, yy, board, positions_list, tiers_list)
+            horizontal_pos = generate_question(board,vertical_pos, horizontal_pos, reserve_players,starting_11)
+
+            insert_reserve_players_amount(board,reserve_players)
+            insert_squad_into_board(board,starting_11,'STARTING 11', 5)
+            insert_string_into_board('LEVEL: ' + str(level), board, 45, 155)
+            insert_string_into_board('BOSS OVERALL: ' + str(boss_overall), board, 46, 155)
+
+            print_board(board)
+
+            if last_level != level:
+                change_board = True
+                os.system("clear")
+                for i in range(randint(3,5)):
+                    starting_11.remove(random.choice(starting_11))
 
 
 
