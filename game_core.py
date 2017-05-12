@@ -1,6 +1,6 @@
 import os
 from time import sleep
-
+from end_game_ascii import *
 import random
 from random import randint
 from random import randrange
@@ -85,6 +85,8 @@ def cold_hot_game(lifes):
                 number = int(input('\n Guess #' + str(counter) + ' : '))
             except:
                 number = 0
+
+            counter += 1
             # checking if input is correct
             if len(str(number)) != 3:
                 print('Wrong number typed, try again with 3 digit number: ')
@@ -94,13 +96,9 @@ def cold_hot_game(lifes):
                 You got it!
                         ''')
                 counter == 11
-                again = input('Do you want to play again? [yes/no]')
-                if again == 'yes':
-                    random_numb = str(randint(100,999))
-                    counter = 1
-                else:
-                    os.system("clear")
-                    return None
+
+                os.system("clear")
+                return None
 
             # checking similarity of typed number and random number
             else:
@@ -116,9 +114,9 @@ def cold_hot_game(lifes):
                     char_iterator += 1
                 if char_guessed == 0:
                     print('cold')
-                counter += 1
-            print(random_numb)
 
+            print(random_numb)
+        print_game_over()
         exit()
 
 
@@ -404,8 +402,8 @@ def inventory_main_view(main_footballers_list, sub_footballers_list, pressed_key
                         level += 1
                         boss_overall += 10
                     else:
-                        print('YOUR OVERALL IS TOO LOW, I DONT WANT TO PLAY A GAME WITH YOU! \n GAME OVER SCREEN')
-                        sleep(5)
+                        print('YOUR OVERALL IS TOO LOW, I DONT WANT TO PLAY A GAME WITH YOU! \n')
+                        print_game_over()
                         exit()
                 return level, boss_overall
 
@@ -791,7 +789,6 @@ def main():
                 os.system("clear")
                 for i in range(randint(3,5)):
                     starting_11.remove(random.choice(starting_11))
-
-
+    print_you_won()
 
 main()
