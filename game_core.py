@@ -787,5 +787,6 @@ def main():
                 for i in range(randint(3,5)):
                     starting_11.remove(random.choice(starting_11))
     print_you_won()
+    # end game
 
 main()
