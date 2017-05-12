@@ -14,9 +14,6 @@ class colors:
     END = '\x1b[0m'
 
 
-
-
-
 '''
 def getch():
     import sys, tty, termios
@@ -338,7 +335,7 @@ def create_building(box_range, board, reserved_sign, level, pos_x=0, pos_y=0):
     for x in range(0, box_range):
         for y in range(0, box_range):
             if x == 0 or x == (box_range - 1):    # because func range count from 0 not from 1
-                board[x + pos_x][y + pos_y] = reserved_sign[1]
+                board[x + pos_x][y + pos_y] = reserved_sign[level]
             else:
                 if y == 0 or y == box_range - 1:
                     board[x + pos_x][y + pos_y] = reserved_sign[level]
