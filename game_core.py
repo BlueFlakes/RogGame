@@ -70,9 +70,9 @@ def main():
             if last_level != level:
                 change_board = True
                 os.system("clear")
+                points = starting_11
                 for i in range(randint(3,5)):
                     starting_11.remove(random.choice(starting_11))
-    print_you_won()
+    print_you_won(points)
     # end game
-
 main()

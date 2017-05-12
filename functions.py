@@ -4,6 +4,21 @@ from random import randrange
 import os
 from time import sleep
 
+def make_string(nested_list):
+    string = ''
+    for line in nested_list:
+        line_string = ''
+        iterator = 1
+        for element in line:
+            line_string += element
+            if iterator == 1:
+                line_string += ','
+            iterator += 1
+        string += line_string
+        string += '\n'
+    return string
+
+
 
 def print_game_over():
     import os
@@ -33,7 +48,7 @@ def print_game_over():
 
         sleep(0.25)
 
-def print_you_won():
+def print_you_won(starting_11):
     import os
     os.system("clear")
     print('''
@@ -86,7 +101,41 @@ def print_you_won():
 
 
     ''')
+    name = input("It's finish I know, but what is your name ?: ")
 
+    finish_ovr = str(calculate_ovr(starting_11))
+    score = [name, finish_ovr]
+
+    highscores = load_highscores()
+    if highscores[0][0] in ["", " "]:
+        del highscores[0]
+
+    highscores.append(score)
+    if len(highscores) > 1:
+        for x in range(len(highscores)):
+            for y in range(x, len(highscores)):
+                if int(highscores[y][1]) > int(highscores[x][1]):
+                    temp_record = highscores[x]
+                    highscores[x] = highscores[y]
+                    highscores[y] = temp_record
+
+    hsc_list = highscores
+    highscores = make_string(highscores)
+    with open ('scores.txt', 'w') as file:
+        file.write(highscores)
+
+    for x in range(len(hsc_list)):
+        print(str(x+1)+".", hsc_list[x][0]+ ", ovr:", hsc_list[x][1].rjust(25 -len(hsc_list[x][0])-len(str(x+1))))
+
+def load_highscores():
+    with open("scores.txt", "r") as file:
+        data_score_list = file.readlines()
+
+    temp_storage = []
+    for record in data_score_list:
+        temp_storage.append(record.rstrip("\n").split(","))
+    highscores = temp_storage
+    return highscores
 
 
 
